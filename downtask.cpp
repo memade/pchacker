@@ -138,7 +138,7 @@ namespace local {
  }
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
  DownTaskNode::DownTaskNode() {
-  m_pRequestObj = Global::HttpGet()->CreateRequest();
+  //m_pRequestObj = Global::HttpGet()->CreateRequest();
  }
  DownTaskNode::DownTaskNode(const std::string& gbk_json_data) {
   do {
@@ -181,7 +181,7 @@ namespace local {
    if (doc.HasMember("account") && doc["account"].IsString())
     m_Account = doc["account"].GetString(); 
   } while (0);
-  m_pRequestObj = Global::HttpGet()->CreateRequest();
+  //m_pRequestObj = Global::HttpGet()->CreateRequest();
  }
  DownTaskNode::~DownTaskNode() {
 
@@ -236,8 +236,8 @@ namespace local {
     break;
    if (m_Url.empty())
     break;
-   if (!m_pRequestObj)
-    break;
+   /*if (!m_pRequestObj)
+    break;*/
    result = true;
   } while (0);
   return result;
@@ -394,13 +394,15 @@ namespace local {
    std::string file_name;
    std::string file_format;
    shared::Win::GetFileNameAndFormat(m_LogoUrl, file_name, file_format);
-   m_LogoPathname = shared::Win::PathFixedA(Global::PCHacherGet()->SystemDirectoryA() + "\\logos\\" + std::to_string(m_ID) + file_format);
+   m_LogoPathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\logos\\" + std::to_string(m_ID) + file_format);
    //!@ 初始化最终下载文件名
    shared::Win::GetFileNameAndFormat(m_Url, file_name, file_format);
-   m_FinishPathname = shared::Win::PathFixedA(Global::PCHacherGet()->SystemDirectoryA() + "\\finishs\\" + std::to_string(m_ID) + file_format);
+   m_FinishPathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\finishs\\" + std::to_string(m_ID) + file_format);
    //!@ 初始化下载缓冲文件路径名
-   m_DownCacheFilePathname = shared::Win::PathFixedA(Global::PCHacherGet()->SystemDirectoryA() + "\\caches\\" + std::to_string(m_ID) + file_format);
+   m_DownCacheFilePathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\caches\\" + std::to_string(m_ID) + file_format);
 
+
+#if 0
    auto reqHead = Global::HttpGet()->CreateRequest();
    reqHead->RequestUrl(m_Url);
    reqHead->Header(true);
@@ -422,6 +424,8 @@ namespace local {
     });
    Global::HttpGet()->PerformM({ reqLogo,reqHead });
    Global::HttpGet()->DestoryRequest({ reqLogo,reqHead });
+
+#endif
 
 #if 0
    auto pReqObj = Global::PCDownGet()->HttpObj()->RouteCreate();

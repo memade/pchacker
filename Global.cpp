@@ -22,34 +22,34 @@ namespace local {
 			if (!m_pCef3Obj)
 				break;
 #endif
-			m_pHttpObj = malware::http::IHttpApi::CreateInterface((shared::Win::GetModulePathA(__gpHinstance) + "malware.dll").c_str());
+			/*m_pHttpObj = malware::http::IHttpApi::CreateInterface((shared::Win::GetModulePathA(__gpHinstance) + "malware.dll").c_str());
 			if (!m_pHttpObj)
-				break;
-			m_pPCHacher = new PCHacher();
+				break;*/
+			m_pPCHacker = new PCHacker();
 			m_Ready.store(true);
 		} while (0);
 		return m_Ready.load();
 	}
 
 	void Global::UnInit() {
-		SK_DELETE_PTR(m_pPCHacher);
-		malware::http::IHttpApi::DestoryInterface(m_pHttpObj);
+		SK_DELETE_PTR(m_pPCHacker);
+		//malware::http::IHttpApi::DestoryInterface(m_pHttpObj);
 #if ENABLE_MODULE_CEF3
 		shared::cef3::ICef3Api::DestoryInterface(m_pCef3Obj);
 #endif
 	}
 
 
-	PCHacher* Global::PCHacherGet() {
-		PCHacher* result = nullptr;
+	PCHacker* Global::PCHackerGet() {
+		PCHacker* result = nullptr;
 		do {
 			if (!__gpGlobal)
 				break;
-			result = __gpGlobal->m_pPCHacher;
+			result = __gpGlobal->m_pPCHacker;
 		} while (0);
 		return result;
 	}
-	malware::http::IHttpApi* Global::HttpGet() {
+	/*malware::http::IHttpApi* Global::HttpGet() {
 		malware::http::IHttpApi* result = nullptr;
 		do {
 			if (!__gpGlobal)
@@ -57,7 +57,7 @@ namespace local {
 			result = __gpGlobal->m_pHttpObj;
 		} while (0);
 		return result;
-	}
+	}*/
 #if ENABLE_MODULE_CEF3
 	shared::cef3::ICef3Api* Global::Cef3Get() {
 		shared::cef3::ICef3Api* result = nullptr;

@@ -1,16 +1,16 @@
 ﻿#include "stdafx.h"
 
 namespace local {
- PCHacher::PCHacher() {
+ PCHacker::PCHacker() {
   Init();
  }
- PCHacher::~PCHacher() {
+ PCHacker::~PCHacker() {
   UnInit();
  }
- const std::wstring& PCHacher::UISkinDirectory() const {
+ const std::wstring& PCHacker::UISkinDirectory() const {
   return m_UISkinDirectory;
  }
- void PCHacher::Init() {
+ void PCHacker::Init() {
   m_SystemDirectoryW = shared::Win::PathFixedW(\
    shared::Win::GetModulePathW(__gpHinstance) + L"\\" + shared::Win::GetModuleNameW(true, __gpHinstance) + L"\\");
   m_SystemDirectoryA = shared::IConv::WStringToMBytes(m_SystemDirectoryW);
@@ -47,7 +47,7 @@ namespace local {
   m_IsOpen.store(true);
   m_Threads.emplace_back([this]() {Process(); });
  }
- void PCHacher::UnInit() {
+ void PCHacker::UnInit() {
   for (auto& ui : m_UIMap) {
    ui.second->Close();
    /*SK_DELETE_PTR(ui.second);*/
@@ -58,7 +58,7 @@ namespace local {
   m_Threads.clear();
   ::CoUninitialize();
  }
- bool PCHacher::OnDockingFormDockingData(DockingData* pDockingData) {
+ bool PCHacker::OnDockingFormDockingData(DockingData* pDockingData) {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
@@ -73,7 +73,7 @@ namespace local {
   } while (0);
   return result;
  }
- bool PCHacher::OnDockingFormHost(const std::wstring& json_data_w, const tfDockingMessageCb& docking_msg_cb) {
+ bool PCHacker::OnDockingFormHost(const std::wstring& json_data_w, const tfDockingMessageCb& docking_msg_cb) {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   std::string result_data = R"()";
@@ -132,11 +132,13 @@ namespace local {
    case EnDockingMessageType::LocalInstalled: {
     std::string test_res = R"({"localRes":[{"gameId":1,"logoPathname":"c:/icons/1.jpg","gameName":"战地1942","accounts":[100026,100025,100027]},{"gameId":3,"logoPathname":"c:/icons/3.jpg","gameName":"战地1943","accounts":[100026,100027]},{"gameId":5,"logoPathname":"c:/icons/5.jpg","gameName":"战地1945","accounts":[100027]}]})";
     std::string utf8_test_res = shared::IConv::MBytesToUTF8(test_res);
-    shared::Openssl::Base64Encode(utf8_test_res, result_data);
+    //shared::Openssl::Base64Encode(utf8_test_res, result_data);
     result = !result_data.empty();
     dockingResult = result ? EnDockingResultType::Success : EnDockingResultType::Failed;
    }break;
    default: {
+
+
 
    }break;
    }///switch
@@ -147,7 +149,7 @@ namespace local {
   return result;
  }
 
- bool PCHacher::__DownTaskPerform(IDownTaskNode* pTask) {
+ bool PCHacker::__DownTaskPerform(IDownTaskNode* pTask) {
   bool result = false;
   do {
    auto pTaskNode = dynamic_cast<DownTaskNode*>(pTask);
@@ -172,11 +174,11 @@ namespace local {
   } while (0);
   return result;
  }
- bool PCHacher::DownTaskPerform(IDownTaskNode* pTask) {
+ bool PCHacker::DownTaskPerform(IDownTaskNode* pTask) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return __DownTaskPerform(pTask);
  }
- bool PCHacher::DownTaskDestory(IDownTaskNode* pTask) {
+ bool PCHacker::DownTaskDestory(IDownTaskNode* pTask) {
   bool result = false;
   do {
    auto pRemoveObj = dynamic_cast<DownTaskNode*>(pTask);
@@ -189,7 +191,7 @@ namespace local {
   } while (0);
   return result;
  }
- bool PCHacher::DownTaskAction(const TypeID& resid, const DownActionType& action) {
+ bool PCHacker::DownTaskAction(const TypeID& resid, const DownActionType& action) {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   result = m_DownTaskNodes.search(resid,
@@ -198,13 +200,13 @@ namespace local {
    });
   return result;
  }
- IDownTaskNode* PCHacher::DownTaskCreate() {
+ IDownTaskNode* PCHacker::DownTaskCreate() {
   IDownTaskNode* result = nullptr;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   result = dynamic_cast<IDownTaskNode*>(m_DownTaskNodeCaches.emplace_back(new DownTaskNode()));
   return result;
  }
- HWND PCHacher::UICreate(const UIType& uitype, const bool& show) {
+ HWND PCHacker::UICreate(const UIType& uitype, const bool& show) {
   HWND result = nullptr;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   UIBase* base = nullptr;
@@ -247,7 +249,7 @@ namespace local {
   } while (0);
   return result;
  }
- bool PCHacher::UIShowIs(const UIType& uitype) const {
+ bool PCHacker::UIShowIs(const UIType& uitype) const {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
@@ -258,7 +260,7 @@ namespace local {
   } while (0);
   return result;
  }
- void PCHacher::UIShowStatusbarProgressCtrl(const bool& show) {
+ void PCHacker::UIShowStatusbarProgressCtrl(const bool& show) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
    auto base = m_UIMap.find(EnUIType::StatusBarUI);
@@ -267,7 +269,7 @@ namespace local {
    base->second->StatusbarProgressCtrl(show);
   } while (0);
  }
- void PCHacher::UIPositionSet(const UIType& uiType, const ::tagPOINT& uiPoint, const ::tagSIZE& uiSize) {
+ void PCHacker::UIPositionSet(const UIType& uiType, const ::tagPOINT& uiPoint, const ::tagSIZE& uiSize) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
    auto base = m_UIMap.find(uiType);
@@ -278,12 +280,12 @@ namespace local {
    base->second->SetPosition(uiPoint, uiSize);
   } while (0);
  }
- void PCHacher::UIRefresh() const {
+ void PCHacker::UIRefresh() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   for (const auto& ui_node : m_UIMap)
    ui_node.second->Refresh();
  }
- void PCHacher::UIShow(const UIType& uitype, const bool& show) {
+ void PCHacker::UIShow(const UIType& uitype, const bool& show) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
    auto base = m_UIMap.find(uitype);
@@ -306,7 +308,7 @@ namespace local {
    base->second->Show(show);
   } while (0);
  }
- HWND PCHacher::ParentHwnd(const UIType& uiType) const {
+ HWND PCHacker::ParentHwnd(const UIType& uiType) const {
   HWND result = nullptr;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
@@ -319,7 +321,7 @@ namespace local {
   } while (0);
   return result;
  }
- void PCHacher::ParentHwndSet(const UIType& uiType, const HWND& parent) {
+ void PCHacker::ParentHwndSet(const UIType& uiType, const HWND& parent) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
    auto base = m_UIMap.find(uiType);
@@ -330,7 +332,7 @@ namespace local {
    base->second->ParentSet(parent);
   } while (0);
  }
- void* PCHacher::UIGetHwnd(const UIType& uitype) const {
+ void* PCHacker::UIGetHwnd(const UIType& uitype) const {
   void* result = nullptr;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
@@ -344,7 +346,7 @@ namespace local {
   return result;
  }
 
- bool PCHacher::OpenResourceCreateDaemonNode(const std::string& ResourcePathname) {
+ bool PCHacker::OpenResourceCreateDaemonNode(const std::string& ResourcePathname) {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
@@ -359,27 +361,27 @@ namespace local {
   return result;
  }
 
- const IConfigure* PCHacher::SystemConfigureGet() const {
+ const IConfigure* PCHacker::SystemConfigureGet() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return dynamic_cast<const IConfigure*>(this);
  }
- const std::wstring& PCHacher::SystemDirectoryW() const {
+ const std::wstring& PCHacker::SystemDirectoryW() const {
   /*std::lock_guard<std::mutex> lock{ *m_Mutex };*/
   return m_SystemDirectoryW;
  }
- const std::string& PCHacher::SystemDirectoryA() const {
+ const std::string& PCHacker::SystemDirectoryA() const {
   /*std::lock_guard<std::mutex> lock{ *m_Mutex };*/
   return m_SystemDirectoryA;
  }
- const std::wstring& PCHacher::CurrentUserDirectoryW() const {
+ const std::wstring& PCHacker::CurrentUserDirectoryW() const {
   /*std::lock_guard<std::mutex> lock{ *m_Mutex };*/
   return m_CurrentUserDirectoryW;
  }
- const std::string& PCHacher::CurrentUserDirectoryA() const {
+ const std::string& PCHacker::CurrentUserDirectoryA() const {
   /*std::lock_guard<std::mutex> lock{ *m_Mutex };*/
   return m_CurrentUserDirectoryA;
  }
- void PCHacher::Process() {
+ void PCHacker::Process() {
 #if ENABLE_MODULE_UI
   UIBase* pUIDownMgr = nullptr;
   UIBase* pUIStatusbar = nullptr;
@@ -506,4 +508,26 @@ namespace local {
    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   } while (1);
  }
+
+
+
+
+
+
+
+
+
+
+
+
+ bool PCHacker::Bit7zArchiveProcess() {
+  return false;
+ }
+ bool PCHacker::ZipArchiveProcess() {
+  return false;
+ }
+
+
+
+
 }///namespace lcoal

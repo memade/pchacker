@@ -109,9 +109,9 @@ namespace local {
  void Configure::Init() {
   bool file_init_flag = false;
 
-  m_PathForStoringTheInstallationPackage = Global::PCHacherGet()->SystemDirectoryA();
+  m_PathForStoringTheInstallationPackage = Global::PCHackerGet()->SystemDirectoryA();
 
-  m_ProgramInstallationPath = Global::PCHacherGet()->SystemDirectoryA();
+  m_ProgramInstallationPath = Global::PCHackerGet()->SystemDirectoryA();
 #if 0
   m_InstallpakSavePath = "c:\\games\\";
   m_InstallBasePath = "c:\\games\\";
@@ -213,63 +213,63 @@ namespace local {
 
  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
- bool PCHacher::StartsAutomaticallyWhenStarts() const {
+ bool PCHacker::StartsAutomaticallyWhenStarts() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_StartsAutomaticallyWhenStarts;
  }
- bool PCHacher::LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup() const {
+ bool PCHacker::LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup;
  }
- bool PCHacher::AutomaticallyInstalledAfterDownloading() const {
+ bool PCHacker::AutomaticallyInstalledAfterDownloading() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_AutomaticallyInstalledAfterDownloading;
  }
- bool PCHacher::NoPromotionalAdsAreDisplayedWhenOpened() const {
+ bool PCHacker::NoPromotionalAdsAreDisplayedWhenOpened() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_NoPromotionalAdsAreDisplayedWhenOpened;
  }
- bool PCHacher::NoMoreRemindersEverytimeItClosesInClickCloseBtn() const {
+ bool PCHacker::NoMoreRemindersEverytimeItClosesInClickCloseBtn() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_NoMoreRemindersEverytimeItClosesInClickCloseBtn;
  }
- bool PCHacher::MinimizeToSystemTrayInClickCloseBtn() const {
+ bool PCHacker::MinimizeToSystemTrayInClickCloseBtn() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_MinimizeToSystemTrayInClickCloseBtn;
  }
- bool PCHacher::ExitImmediatelyInClickCloseBtn() const {
+ bool PCHacker::ExitImmediatelyInClickCloseBtn() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ExitImmediatelyInClickCloseBtn;
  }
- const std::string& PCHacher::PathForStoringTheInstallationPackage() const {
+ const std::string& PCHacker::PathForStoringTheInstallationPackage() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_PathForStoringTheInstallationPackage;
  }
- const std::string& PCHacher::ProgramInstallationPath() const {
+ const std::string& PCHacker::ProgramInstallationPath() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ProgramInstallationPath;
  }
- bool PCHacher::NolimitOnDownloadSpeed() const {
+ bool PCHacker::NolimitOnDownloadSpeed() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_NolimitOnDownloadSpeed;
  }
- const unsigned int& PCHacher::DownloadSpeedThreshold() const {
+ const unsigned int& PCHacker::DownloadSpeedThreshold() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_DownloadSpeedThreshold;
  }
- bool PCHacher::InstallationPackageAutomaticallyDownloadedToDefaultPath() const {
+ bool PCHacker::InstallationPackageAutomaticallyDownloadedToDefaultPath() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_InstallationPackageAutomaticallyDownloadedToDefaultPath;
  }
- const unsigned int& PCHacher::TheInstallationPackageIsReservedDays() const {
+ const unsigned int& PCHacker::TheInstallationPackageIsReservedDays() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_TheInstallationPackageIsReservedDays;
  }
- bool PCHacher::ShutDownAfterDownloading() const {
+ bool PCHacker::ShutDownAfterDownloading() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ShutDownAfterDownloading;
  }
- const unsigned int& PCHacher::DisableDelayInMinutes() const {
+ const unsigned int& PCHacker::DisableDelayInMinutes() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_DisableDelayInMinutes;
  }

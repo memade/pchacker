@@ -5,7 +5,6 @@
 #define ENABLE_MODULE_UI 0
 
 #include <win.h>
-#include <openssl.hpp>
 #include <zip++.h>
 #include <rapidjson.h>
 #include <rapidxml.h>
@@ -16,9 +15,9 @@
 #if ENABLE_MODULE_CEF3
 #include "cef3.hpp"
 #endif
-#include "malware.hpp"
-#include "pchacher.hpp"
-using namespace shared::pchacher;
+//#include "malware.hpp"
+#include "pchacker.hpp"
+using namespace pchacker;
 #include "local.h"
 #include "configure.h"
 #include "downtask.h"
@@ -30,7 +29,7 @@ using namespace shared::pchacher;
 #include "uidownmanager.h"
 #include "uistatusbar.h"
 #include "uimain.h"
-#include "pchacher.h"
+#include "pchacker.h"
 #include "Global.h"
 #include "export.h"
 

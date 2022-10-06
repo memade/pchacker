@@ -30,7 +30,7 @@ namespace local {
 #ifdef _DEBUG
    CPaintManagerUI::SetResourcePath(LR"(D:\__SVN__\Memade\projects\pcdown\res\skin\)");
 #else
-   CPaintManagerUI::SetResourcePath(Global::PCHacherGet()->UISkinDirectory().c_str());
+   CPaintManagerUI::SetResourcePath(Global::PCHackerGet()->UISkinDirectory().c_str());
 #endif
    DWORD dwCreateStyle = UI_WNDSTYLE_FRAME;
    do {

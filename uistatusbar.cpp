@@ -42,7 +42,7 @@ namespace local {
 #endif
 #else
 
-   CPaintManagerUI::SetResourcePath(Global::PCHacherGet()->UISkinDirectory().c_str());
+   CPaintManagerUI::SetResourcePath(Global::PCHackerGet()->UISkinDirectory().c_str());
 #endif
    DWORD dwCreateStyle = UI_WNDSTYLE_FRAME;
    do {
@@ -156,14 +156,14 @@ namespace local {
   else if (msg.sType == DUI_MSGTYPE_CLICK) {
    if (m_pUIButtonActivateDownTable == msg.pSender) {//!@ 激活下载管理窗口按钮
     do {
-     HWND hParent = Global::PCHacherGet()->ParentHwnd(EnUIType::DownManagerUI);
+     HWND hParent = Global::PCHackerGet()->ParentHwnd(EnUIType::DownManagerUI);
      HWND hPCHacher = \
-      reinterpret_cast<HWND>(Global::PCHacherGet()->UIGetHwnd(EnUIType::DownManagerUI));
+      reinterpret_cast<HWND>(Global::PCHackerGet()->UIGetHwnd(EnUIType::DownManagerUI));
      if (!hPCHacher) {
-      if (!Global::PCHacherGet()->UICreate(EnUIType::DownManagerUI, false))
+      if (!Global::PCHackerGet()->UICreate(EnUIType::DownManagerUI, false))
        break;
       hPCHacher = \
-       reinterpret_cast<HWND>(Global::PCHacherGet()->UIGetHwnd(EnUIType::DownManagerUI));
+       reinterpret_cast<HWND>(Global::PCHackerGet()->UIGetHwnd(EnUIType::DownManagerUI));
       if (!hPCHacher)
        break;
 
@@ -171,8 +171,8 @@ namespace local {
        ::SetParent(hPCHacher, hParent);
      }
 
-     if (Global::PCHacherGet()->UIShowIs(EnUIType::DownManagerUI)) {
-      Global::PCHacherGet()->UIShow(EnUIType::DownManagerUI, false);
+     if (Global::PCHackerGet()->UIShowIs(EnUIType::DownManagerUI)) {
+      Global::PCHackerGet()->UIShow(EnUIType::DownManagerUI, false);
      }
      else {
       RECT rtStatusbarClient = { 0 };
@@ -199,7 +199,7 @@ namespace local {
         rtStatusbarWindow.top - (rtPCDownWindow.bottom - rtPCDownWindow.top),
         0, 0, SWP_NOSIZE | SWP_NOZORDER);
       }
-      Global::PCHacherGet()->UIShow(EnUIType::DownManagerUI, true);
+      Global::PCHackerGet()->UIShow(EnUIType::DownManagerUI, true);
      }
 
     } while (0);

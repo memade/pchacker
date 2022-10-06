@@ -84,8 +84,6 @@ namespace local {
   shared::container::queue<ProgressRoute> m_ProgressRouteQ;
   void OnProgressChanged();
   std::vector<std::thread> m_Threads;
- protected:
-  malware::http::IRequest* m_pRequestObj = nullptr;
  };
 
 }///namespace local 

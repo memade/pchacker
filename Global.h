@@ -12,11 +12,11 @@ namespace local {
 	private:
 		void UnInit();
 	public:
-		static PCHacher* PCHacherGet();
-		static malware::http::IHttpApi* HttpGet();
+		static PCHacker* PCHackerGet();
+		/*static malware::http::IHttpApi* HttpGet();*/
 	private:
-		PCHacher* m_pPCHacher = nullptr;
-		malware::http::IHttpApi* m_pHttpObj = nullptr;
+		PCHacker* m_pPCHacker = nullptr;
+		//malware::http::IHttpApi* m_pHttpObj = nullptr;
 		std::atomic_bool m_Ready = false;
 
 #if ENABLE_MODULE_CEF3

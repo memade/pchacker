@@ -11,7 +11,7 @@ __shared_api_ void* __stdcall api_object_init(const void*, unsigned long) {
    break;
 
 
-  result = dynamic_cast<IPCHacher*>(local::Global::PCHacherGet());
+  result = dynamic_cast<IPCHacker*>(local::Global::PCHackerGet());
  } while (0);
  return result;
 }

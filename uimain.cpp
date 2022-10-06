@@ -42,7 +42,7 @@ namespace local {
 #endif
 #else
 
-   CPaintManagerUI::SetResourcePath(Global::PCHacherGet()->UISkinDirectory().c_str());
+   CPaintManagerUI::SetResourcePath(Global::PCHackerGet()->UISkinDirectory().c_str());
 #endif
    DWORD dwCreateStyle = UI_WNDSTYLE_FRAME;
    do {

@@ -44,7 +44,7 @@ namespace local {
 #ifdef _DEBUG
 			CPaintManagerUI::SetResourcePath(LR"(D:\__SVN__\Memade\projects\pcdown\res\skin\)");
 #else
-			CPaintManagerUI::SetResourcePath(Global::PCHacherGet()->UISkinDirectory().c_str());
+			CPaintManagerUI::SetResourcePath(Global::PCHackerGet()->UISkinDirectory().c_str());
 #endif
 #endif
 
@@ -169,7 +169,7 @@ namespace local {
 				do {
 					if (!parent)
 						break;
-					Global::PCHacherGet()->DownTaskAction(parent->GetTagUINT64(),EnDownActionType::Remove);
+					Global::PCHackerGet()->DownTaskAction(parent->GetTagUINT64(),EnDownActionType::Remove);
 				} while (0);
 			}
 			else if (msg.pSender->GetName() == L"06A057E7350B") {//!@ 下载任务节点暂停/停止 | 开始/启动
@@ -178,7 +178,7 @@ namespace local {
 				do {
 					if (!parent)
 						break;
-					Global::PCHacherGet()->DownTaskAction(parent->GetTagUINT64(), running ? EnDownActionType::Pause : EnDownActionType::Preparation);
+					Global::PCHackerGet()->DownTaskAction(parent->GetTagUINT64(), running ? EnDownActionType::Pause : EnDownActionType::Preparation);
 				} while (0);
 			}
 			else if (msg.pSender->GetName() == L"D90336733AF1") {//!@ 下载任务节点重置
@@ -186,7 +186,7 @@ namespace local {
 				do {
 					if (!parent)
 						break;
-					Global::PCHacherGet()->DownTaskAction(parent->GetTagUINT64(), EnDownActionType::Reset);
+					Global::PCHackerGet()->DownTaskAction(parent->GetTagUINT64(), EnDownActionType::Reset);
 				} while (0);
 			}
 			else if (msg.pSender == m_pUIOptionDowning) {

@@ -3,11 +3,11 @@
 
 namespace local {
 
- class PCHacher final : public IPCHacher, public IConfigure {
+ class PCHacker final : public IPCHacker, public IConfigure {
   std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
  public:
-  PCHacher();
-  virtual ~PCHacher();
+  PCHacker();
+  virtual ~PCHacker();
  private:
   void Init();
   void UnInit();
@@ -36,7 +36,7 @@ namespace local {
   void UIShow(const UIType&, const bool& show) override final;
   void UIShowStatusbarProgressCtrl(const bool&) override final;
   void UIRefresh() const override final;
-  void UIPositionSet(const UIType& , const ::tagPOINT&, const ::tagSIZE&) override final;
+  void UIPositionSet(const UIType&, const ::tagPOINT&, const ::tagSIZE&) override final;
   HWND UICreate(const UIType&, const bool& show) override final;
   IDownTaskNode* DownTaskCreate() override final;
   bool DownTaskAction(const TypeID&, const DownActionType&) override final;
@@ -100,6 +100,10 @@ namespace local {
   bool m_ShutDownAfterDownloading = false;
   /// 关闭延迟分钟数
   unsigned int m_DisableDelayInMinutes = 240;
+
+ protected:
+  bool Bit7zArchiveProcess() override final;
+   bool ZipArchiveProcess() override final;
  };
 
 }///namespace local 
