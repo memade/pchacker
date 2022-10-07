@@ -39,6 +39,7 @@
     <ClCompile Include="uimain.cpp" />
     <ClCompile Include="uimessagebox.cpp" />
     <ClCompile Include="uistatusbar.cpp" />
+    <ClCompile Include="wxuimain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="configure.h" />
@@ -57,6 +58,7 @@
     <ClInclude Include="uimain.h" />
     <ClInclude Include="uimessagebox.h" />
     <ClInclude Include="uistatusbar.h" />
+    <ClInclude Include="wxuimain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pchacker.def" />
@@ -149,7 +151,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\3rdparty;$(SolutionDir)..\..\projects\$(projectname)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -159,7 +161,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>$(SolutionDir)..\..\projects\$(ProjectName)\$(ProjectName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_lib\</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -182,7 +184,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\3rdparty;$(SolutionDir)..\..\projects\$(projectname)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -192,7 +194,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>$(SolutionDir)..\..\projects\$(ProjectName)\$(ProjectName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_x64_lib\</AdditionalLibraryDirectories>
       <AdditionalDependencies>msvcrtd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>msvcrtd.lib;LIBCMTD;</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -214,7 +216,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\3rdparty;$(SolutionDir)..\..\projects\$(projectname)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <Optimization>Full</Optimization>
@@ -227,7 +229,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>$(SolutionDir)..\..\projects\$(ProjectName)\$(ProjectName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_lib\</AdditionalLibraryDirectories>
       <AdditionalOptions>/NXCOMPAT:NO %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <IgnoreSpecificDefaultLibraries>
@@ -254,7 +256,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\3rdparty;$(SolutionDir)..\..\projects\$(projectname)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <Optimization>MaxSpeed</Optimization>
@@ -267,7 +269,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>$(SolutionDir)..\..\projects\$(ProjectName)\$(ProjectName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_x64_lib\</AdditionalLibraryDirectories>
       <AdditionalOptions>/NXCOMPAT:NO %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <IgnoreSpecificDefaultLibraries>MSVCRT.LIB;LIBCMT;</IgnoreSpecificDefaultLibraries>

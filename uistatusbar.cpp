@@ -15,12 +15,12 @@ namespace local {
   /*delete this;*////Release can cause a crash
  }
  const HWND& UIStatusBar::Hwnd() const {
-  return m_hWnd;
+  return UIBase::m_hWnd;
  }
  bool UIStatusBar::IsOpen() const {
   return m_IsOpen.load();
  }
- void UIStatusBar::Open() {
+ void UIStatusBar::Create() {
   do {
    if (m_IsOpen.load())
     break;
@@ -52,15 +52,15 @@ namespace local {
      break;
     dwCreateStyle &= ~WS_VISIBLE;
    } while (0);
-   m_hWnd = Create(NULL, _TEXT("PCDown Statusbar®"), dwCreateStyle, 0L);
-   if (!m_hWnd)
+   UIBase::m_hWnd = UIFrame::Create(NULL, _TEXT("PCDown Statusbar®"), dwCreateStyle, 0L);
+   if (!UIBase::m_hWnd)
     break;
    m_IsOpen.store(true);
    CenterWindow();
    CPaintManagerUI::MessageLoop();
   } while (0);
  }
- void UIStatusBar::Close() {
+ void UIStatusBar::Destory() {
   do {
    if (!m_IsOpen.load())
     break;
@@ -177,8 +177,8 @@ namespace local {
      else {
       RECT rtStatusbarClient = { 0 };
       RECT rtStatusbarWindow = { 0 };
-      ::GetClientRect(m_hWnd, &rtStatusbarClient);
-      ::GetWindowRect(m_hWnd, &rtStatusbarWindow);
+      ::GetClientRect(UIBase::m_hWnd, &rtStatusbarClient);
+      ::GetWindowRect(UIBase::m_hWnd, &rtStatusbarWindow);
 
       //!@ 如果指定了模块父窗口则启用客户端定位否则启用屏幕窗口定位
       if (hParent) {
@@ -249,7 +249,7 @@ namespace local {
  void UIStatusBar::Refresh() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
-   HWND hParent = ::GetParent(m_hWnd);
+   HWND hParent = ::GetParent(UIBase::m_hWnd);
    if (!hParent)
     break;
    if (m_tagSize.cx <= 0 && m_tagSize.cy <= 0)
@@ -265,7 +265,7 @@ namespace local {
    cx = m_tagSize.cx <= 0 ? cx : m_tagSize.cx;
    cy = m_tagSize.cy <= 0 ? cy : m_tagSize.cy;
 
-   ::SetWindowPos(m_hWnd, NULL, x, y, cx, cy, SWP_NOACTIVATE);
+   ::SetWindowPos(UIBase::m_hWnd, NULL, x, y, cx, cy, SWP_NOACTIVATE);
   } while (0);
  }
 }///namespace local

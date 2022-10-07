@@ -3,15 +3,15 @@
 
 namespace local {
 
- class UIMain final : public UIBase {
+ class UIMain final : public shared::ui::UIFrame, public UIBase {
  public:
   UIMain(const UIType&, const bool&);
   ~UIMain();
  protected:
   void Init();
   void UnInit();
-  void Open();
-  void Close();
+  void Create() override final;
+  void Destory() override final;
   const HWND& Hwnd() const;
   bool IsOpen() const;
  protected:

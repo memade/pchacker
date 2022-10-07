@@ -15,12 +15,12 @@ namespace local {
 		/*delete this;*////Release can cause a crash
 	}
 	const HWND& UIDownManager::Hwnd() const {
-		return m_hWnd;
+		return UIBase::m_hWnd;
 	}
 	bool UIDownManager::IsOpen() const {
 		return m_IsOpen.load();
 	}
-	void UIDownManager::Open() {
+	void UIDownManager::Create() {
 		do {
 			if (m_IsOpen.load())
 				break;
@@ -56,15 +56,15 @@ namespace local {
 					break;
 				dwCreateStyle &= ~WS_VISIBLE;
 			} while (0);
-			m_hWnd = Create(NULL, _TEXT("PCDown Manager®"), dwCreateStyle, 0L);
-			if (!m_hWnd)
+			UIBase::m_hWnd = UIFrame::Create(NULL, _TEXT("PCDown Manager®"), dwCreateStyle, 0L);
+			if (!UIBase::m_hWnd)
 				break;
 			m_IsOpen.store(true);
 			CenterWindow();
 			CPaintManagerUI::MessageLoop();
 		} while (0);
 	}
-	void UIDownManager::Close() {
+	void UIDownManager::Destory() {
 		do {
 			if (!m_IsOpen.load())
 				break;
@@ -169,7 +169,7 @@ namespace local {
 				do {
 					if (!parent)
 						break;
-					Global::PCHackerGet()->DownTaskAction(parent->GetTagUINT64(),EnDownActionType::Remove);
+					Global::PCHackerGet()->TaskAction(parent->GetTagUINT64(),EnDownActionType::Remove);
 				} while (0);
 			}
 			else if (msg.pSender->GetName() == L"06A057E7350B") {//!@ 下载任务节点暂停/停止 | 开始/启动
@@ -178,7 +178,7 @@ namespace local {
 				do {
 					if (!parent)
 						break;
-					Global::PCHackerGet()->DownTaskAction(parent->GetTagUINT64(), running ? EnDownActionType::Pause : EnDownActionType::Preparation);
+					Global::PCHackerGet()->TaskAction(parent->GetTagUINT64(), running ? EnDownActionType::Pause : EnDownActionType::Preparation);
 				} while (0);
 			}
 			else if (msg.pSender->GetName() == L"D90336733AF1") {//!@ 下载任务节点重置
@@ -186,7 +186,7 @@ namespace local {
 				do {
 					if (!parent)
 						break;
-					Global::PCHackerGet()->DownTaskAction(parent->GetTagUINT64(), EnDownActionType::Reset);
+					Global::PCHackerGet()->TaskAction(parent->GetTagUINT64(), EnDownActionType::Reset);
 				} while (0);
 			}
 			else if (msg.pSender == m_pUIOptionDowning) {
@@ -237,7 +237,7 @@ namespace local {
 		std::lock_guard<std::mutex> lock{ *m_Mutex };
 		return m_pUIListDownTask->GetCount();
 	}
-	bool UIDownManager::RemoveDownTaskNode(DownTaskNode* pTaskNode) {
+	bool UIDownManager::RemoveDownTaskNode(TaskNode* pTaskNode) {
 		bool result = false;
 		std::lock_guard<std::mutex> lock{ *m_Mutex };
 		do {
@@ -263,7 +263,7 @@ namespace local {
 		} while (0);
 		return result;
 	}
-	bool UIDownManager::AppendDownTaskNode(DownTaskNode* pTaskNode) {
+	bool UIDownManager::AppendDownTaskNode(TaskNode* pTaskNode) {
 		bool result = false;
 		std::lock_guard<std::mutex> lock{ *m_Mutex };
 		do {

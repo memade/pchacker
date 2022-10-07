@@ -20,12 +20,12 @@ namespace local {
   void StartingSwitch(const bool&);
  };
 
- class DownTaskNode final : public IDownTaskNode {
+ class TaskNode final : public ITaskNode {
   std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
  public:
-  DownTaskNode();
-  DownTaskNode(const std::string& json_data);
-  virtual ~DownTaskNode();
+  TaskNode();
+  TaskNode(const std::string& json_data);
+  virtual ~TaskNode();
  public:
   void ID(const TypeID&) override final;
   TypeID ID() const override final;

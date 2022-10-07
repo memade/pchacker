@@ -17,12 +17,12 @@ namespace local {
   /*delete this;*////Release can cause a crash
  }
  const HWND& UIConfigure::Hwnd() const {
-  return m_hWnd;
+  return UIBase::m_hWnd;
  }
  bool UIConfigure::IsOpen() const {
   return m_IsOpen.load();
  }
- void UIConfigure::Open() {
+ void UIConfigure::Create() {
   do {
    if (m_IsOpen.load())
     break;
@@ -40,15 +40,15 @@ namespace local {
      break;
     dwCreateStyle &= ~WS_VISIBLE;
    } while (0);
-   m_hWnd = Create(NULL, _TEXT("PCDown Configure®"), dwCreateStyle, 0L);
-   if (!m_hWnd)
+   UIBase::m_hWnd = UIFrame::Create(NULL, _TEXT("PCDown Configure®"), dwCreateStyle, 0L);
+   if (!UIBase::m_hWnd)
     break;
    m_IsOpen.store(true);
    CenterWindow();
    CPaintManagerUI::MessageLoop();
   } while (0);
  }
- void UIConfigure::Close() {
+ void UIConfigure::Destory() {
   do {
    if (!m_IsOpen.load())
     break;

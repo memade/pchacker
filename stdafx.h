@@ -3,6 +3,7 @@
 
 #define ENABLE_MODULE_CEF3 0
 #define ENABLE_MODULE_UI 0
+#define ENABLE_LIBCURLPP 1
 
 #include <win.h>
 #include <zip++.h>
@@ -11,11 +12,13 @@
 #include <encryption.hpp>
 #include <duilib.hpp>
 #include <container.hpp>
-
+#include <wxskin.h>
 #if ENABLE_MODULE_CEF3
 #include "cef3.hpp"
 #endif
-//#include "malware.hpp"
+#if ENABLE_LIBCURLPP
+#include "../libcurlpp/libcurlpp.hpp"
+#endif
 #include "pchacker.hpp"
 using namespace pchacker;
 #include "local.h"
@@ -23,6 +26,7 @@ using namespace pchacker;
 #include "downtask.h"
 #include "Setup.h"
 #include "uibase.h"
+#include "wxuimain.h"
 #include "uicustom.h"
 #include "uimessagebox.h"
 #include "uiconfigure.h"

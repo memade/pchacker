@@ -32,6 +32,7 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_Type;
  }
+#if 0
  void UIBase::Open() {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return;
@@ -48,6 +49,7 @@ namespace local {
    m_IsOpen.store(false);
   } while (0);
  }
+#endif
  void UIBase::ParentSet(const HWND& parent) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
@@ -64,12 +66,12 @@ namespace local {
  }
  void UIBase::OnShowMininized() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  ::ShowWindow(GetHWND(), SW_SHOWMINIMIZED);
+  ::ShowWindow(m_hWnd, SW_SHOWMINIMIZED);
  }
- bool UIBase::AppendDownTaskNode(DownTaskNode*) {
+ bool UIBase::AppendDownTaskNode(TaskNode*) {
   return false;
  }
- bool UIBase::RemoveDownTaskNode(DownTaskNode*) {
+ bool UIBase::RemoveDownTaskNode(TaskNode*) {
   return false;
  }
  void UIBase::Refresh() const {

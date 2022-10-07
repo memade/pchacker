@@ -137,13 +137,13 @@ namespace local {
   } while (0);
  }
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
- DownTaskNode::DownTaskNode() {
+ TaskNode::TaskNode() {
   //m_pRequestObj = Global::HttpGet()->CreateRequest();
  }
- DownTaskNode::DownTaskNode(const std::string& gbk_json_data) {
+ TaskNode::TaskNode(const std::string& gbk_json_data) {
   do {
    if (gbk_json_data.empty())
-    break;   
+    break;
 #if 0
    {
     "module":"runGame",
@@ -179,33 +179,34 @@ namespace local {
    if (doc.HasMember("cmd") && doc["cmd"].IsString())
     m_Cmd = doc["cmd"].GetString();
    if (doc.HasMember("account") && doc["account"].IsString())
-    m_Account = doc["account"].GetString(); 
+    m_Account = doc["account"].GetString();
   } while (0);
   //m_pRequestObj = Global::HttpGet()->CreateRequest();
  }
- DownTaskNode::~DownTaskNode() {
+ TaskNode::~TaskNode() {
 
  }
- void DownTaskNode::LocalResDir(const std::string& path) {
+ void TaskNode::LocalResDir(const std::string& path) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_LocalResDir = path;
  }
- const std::string& DownTaskNode::LocalResDir() const {
+ const std::string& TaskNode::LocalResDir() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_LocalResDir;
  }
- void DownTaskNode::Name(const std::string& name) {
+ void TaskNode::Name(const std::string& name) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_Name = name;
  }
- const std::string& DownTaskNode::Name() const {
+ const std::string& TaskNode::Name() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_Name;
  }
- bool DownTaskNode::operator<<(const DockingData& dockingData) {
+ bool TaskNode::operator<<(const DockingData& dockingData) {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
+#if 0
    if (!dockingData.Verify())
     break;
 
@@ -214,21 +215,21 @@ namespace local {
     m_LogoUrl = shared::IConv::WStringToMBytes(dockingData.YXInstallData.ResIcoUrl);
    //TODO : Further padding is required here
 
-
+#endif
 
    result = true;
   } while (0);
   return result;
  }
- void DownTaskNode::ID(const TypeID& id) {
+ void TaskNode::ID(const TypeID& id) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_ID = id;
  }
- TypeID DownTaskNode::ID() const {
+ TypeID TaskNode::ID() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ID;
  }
- bool DownTaskNode::Verify() const {
+ bool TaskNode::Verify() const {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
@@ -242,7 +243,7 @@ namespace local {
   } while (0);
   return result;
  }
- IDownTaskElement* DownTaskNode::UIDownTaskElementCreate() {
+ IDownTaskElement* TaskNode::UIDownTaskElementCreate() {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   CDialogBuilder builder;
   m_pUIDownTaskElement = builder.Create<IDownTaskElement>(LR"(nodes\uidwontasknode.xml)");
@@ -250,54 +251,54 @@ namespace local {
    m_pUIDownTaskElement->SetName(shared::IConv::MBytesToWString(m_Name));
   return m_pUIDownTaskElement;
  }
- IDownTaskElement* DownTaskNode::UIDownTaskElementGet() const {
+ IDownTaskElement* TaskNode::UIDownTaskElementGet() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_pUIDownTaskElement;
  }
- EnTaskStatus DownTaskNode::Status() const {
+ EnTaskStatus TaskNode::Status() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_Status;
  }
- void DownTaskNode::Status(const EnTaskStatus& status) {
+ void TaskNode::Status(const EnTaskStatus& status) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_Status = status;
  }
- void DownTaskNode::Url(const std::string& url) {
+ void TaskNode::Url(const std::string& url) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_Url = url;
  }
- const std::string& DownTaskNode::Url() const {
+ const std::string& TaskNode::Url() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_Url;
  }
- const unsigned int& DownTaskNode::VipLevel() const {
+ const unsigned int& TaskNode::VipLevel() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_VipLevel;
  }
- void DownTaskNode::VipLevel(const unsigned int& level) {
+ void TaskNode::VipLevel(const unsigned int& level) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_VipLevel = level;
  }
- void DownTaskNode::Logo(const std::string& logo_buffer) {
+ void TaskNode::Logo(const std::string& logo_buffer) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_LogoPathname = logo_buffer;
  }
- const std::string& DownTaskNode::Logo() const {
+ const std::string& TaskNode::Logo() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_LogoPathname;
  }
- void DownTaskNode::Action(const DownActionType& type) {
+ void TaskNode::Action(const DownActionType& type) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_ActionType.store(type);
  }
- DownActionType DownTaskNode::Action() const {
+ DownActionType TaskNode::Action() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ActionType.load();
  }
- bool DownTaskNode::Pause() {
+ bool TaskNode::Pause() {
   return Stop();
  }
- bool DownTaskNode::Start() {
+ bool TaskNode::Start() {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
 #if 0
@@ -361,7 +362,7 @@ namespace local {
 #endif
   return result;
  }
- bool DownTaskNode::Stop() {
+ bool TaskNode::Stop() {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
@@ -383,7 +384,7 @@ namespace local {
   m_Threads.clear();
   return result;
  }
- bool DownTaskNode::Preparation() {
+ bool TaskNode::Preparation() {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
@@ -409,7 +410,7 @@ namespace local {
    reqHead->RequestType(malware::http::EnRequestType::REQUEST_TYPE_HEAD);
    reqHead->FinishCb(
     [&](const malware::http::IResponse* resObj) {
-    
+
 
      result = true;
     });
@@ -503,7 +504,7 @@ namespace local {
   return result;
  }
 
- void DownTaskNode::SetStatusText(const std::wstring& text, const DWORD& color /*= CommonColorMap.at(CommonColorType::White)*/) {
+ void TaskNode::SetStatusText(const std::wstring& text, const DWORD& color /*= CommonColorMap.at(CommonColorType::White)*/) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
    if (!m_pUIDownTaskElement)
@@ -511,7 +512,7 @@ namespace local {
    m_pUIDownTaskElement->StatusTextSet(text, color);
   } while (0);
  }
- void DownTaskNode::SetResourceSizeText(const size_t& total, const size_t& current, const DWORD& color /*= CommonColorMap.at(CommonColorType::White)*/) {
+ void TaskNode::SetResourceSizeText(const size_t& total, const size_t& current, const DWORD& color /*= CommonColorMap.at(CommonColorType::White)*/) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
    if (!m_pUIDownTaskElement)
@@ -520,7 +521,7 @@ namespace local {
   } while (0);
  }
 
- void DownTaskNode::OnProgressChanged() {
+ void TaskNode::OnProgressChanged() {
   const time_t calc_down_speed_interval = 500;
   volatile time_t prev_time_mark = shared::Win::Time::TimeStamp<std::chrono::milliseconds>();
   volatile __int64 prev_down_total = 0;//!@ 前一次下载量

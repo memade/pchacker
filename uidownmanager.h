@@ -4,15 +4,15 @@
 
 namespace local {
 
-	class UIDownManager final : public UIBase {
+	class UIDownManager final : public shared::ui::UIFrame, public UIBase {
 	public:
 		UIDownManager(const UIType&, const bool&);
 		~UIDownManager();
 	protected:
 		void Init();
 		void UnInit();
-		void Open();
-		void Close();
+		void Create() override final;
+		void Destory() override final;
 		const HWND& Hwnd() const;
 		bool IsOpen() const;
 	protected:
@@ -39,8 +39,8 @@ namespace local {
 		COptionUI* m_pUIOptionDownsuc = nullptr;
 		CButtonUI* m_pUIButtonSystemClose = nullptr;
 	protected:
-		bool RemoveDownTaskNode(DownTaskNode*) override final;
-		bool AppendDownTaskNode(DownTaskNode*) override final;
+		bool RemoveDownTaskNode(TaskNode*) override final;
+		bool AppendDownTaskNode(TaskNode*) override final;
 		unsigned int UIListDownTaskCount() const override final;
 		bool SwitchPage(const EnChildPageType&) override final;
 	};

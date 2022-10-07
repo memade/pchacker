@@ -38,10 +38,10 @@ namespace local {
   void UIRefresh() const override final;
   void UIPositionSet(const UIType&, const ::tagPOINT&, const ::tagSIZE&) override final;
   HWND UICreate(const UIType&, const bool& show) override final;
-  IDownTaskNode* DownTaskCreate() override final;
-  bool DownTaskAction(const TypeID&, const DownActionType&) override final;
-  bool DownTaskDestory(IDownTaskNode*) override final;
-  bool DownTaskPerform(IDownTaskNode*) override final;
+  IDownTaskNode* TaskCreate() override final;
+  bool TaskAction(const TypeID&, const DownActionType&) override final;
+  bool TaskDestory(IDownTaskNode*) override final;
+  bool TaskPerform(IDownTaskNode*) override final;
   const std::wstring& SystemDirectoryW() const override final;
   const std::string& SystemDirectoryA() const override final;
   const std::wstring& CurrentUserDirectoryW() const override final;
@@ -50,6 +50,7 @@ namespace local {
   bool OnDockingFormDockingData(DockingData*) override final;
   bool OnDockingFormHost(const std::wstring& json_data, const tfDockingMessageCb&) override final;
  protected:
+  void* GetLibcurlppHandle() const override final;
   bool OpenResourceCreateDaemonNode(const std::string&) override final;
  public:
   HWND ParentHwnd(const UIType&) const;
@@ -60,8 +61,8 @@ namespace local {
   std::vector<std::thread> m_Threads;
   std::atomic_bool m_IsOpen = false;
   std::map<UIType, UIBase*> m_UIMap;
-  shared::container::map<TypeID/*res(game) id*/, DownTaskNode*> m_DownTaskNodes;
-  std::vector<DownTaskNode*> m_DownTaskNodeCaches;
+  shared::container::map<TypeID/*res(game) id*/, TaskNode*> m_DownTaskNodes;
+  std::vector<TaskNode*> m_DownTaskNodeCaches;
   std::wstring m_CurrentUserDirectoryW;
   std::string m_CurrentUserDirectoryA;
   std::wstring m_SystemDirectoryW;
@@ -103,7 +104,9 @@ namespace local {
 
  protected:
   bool Bit7zArchiveProcess() override final;
-   bool ZipArchiveProcess() override final;
+  bool ZipArchiveProcess() override final;
+ private:
+  libcurlpp::IHttpApi* m_pLibcurlHttpApi = nullptr;
  };
 
 }///namespace local 

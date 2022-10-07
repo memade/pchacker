@@ -13,22 +13,22 @@ namespace local {
   Normal = 1,
  };
 
- class UIBase : public shared::ui::UIFrame {
+ class UIBase {
  protected:
   std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
  public:
   UIBase(const UIType&, const bool& init_show);
   ~UIBase();
  public:
-  virtual void Open();
-  virtual void Close();
+  virtual void Create() = 0;
+  virtual void Destory() = 0;
   virtual const HWND& Hwnd() const;
   virtual bool IsOpen() const;
   virtual const UIType& Type() const;
   virtual bool Show() const;
   virtual void Show(const bool&);
-  virtual bool AppendDownTaskNode(DownTaskNode*);
-  virtual bool RemoveDownTaskNode(DownTaskNode*);
+  virtual bool AppendDownTaskNode(TaskNode*);
+  virtual bool RemoveDownTaskNode(TaskNode*);
   virtual unsigned int UIListDownTaskCount() const;
   virtual bool SwitchPage(const EnChildPageType&);
   virtual void DownStatusTotalCount(const size_t&);
@@ -50,6 +50,7 @@ namespace local {
   // position form ui.
   ::tagSIZE m_tagSize = { 0 };
   ::tagPOINT m_tagPoint = { 0 };
+  HANDLE m_UIMainThread = nullptr;
  protected:
   virtual void OnShowMininized() const;
  public:

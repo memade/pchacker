@@ -8,15 +8,15 @@ namespace local {
   Down = 1,
  };
 
- class UIConfigure final : public UIBase {
+ class UIConfigure final : public shared::ui::UIFrame , public UIBase {
  public:
   UIConfigure(const UIType&, const bool&);
   ~UIConfigure();
  protected:
   void Init();
   void UnInit();
-  void Open();
-  void Close();
+  void Create() override final;
+  void Destory() override final;
   const HWND& Hwnd() const;
   bool IsOpen() const;
  protected:

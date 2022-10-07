@@ -3,15 +3,15 @@
 
 namespace local {
 
- class UIStatusBar final : public UIBase {
+ class UIStatusBar final : public shared::ui::UIFrame, public UIBase {
  public:
   UIStatusBar(const UIType&, const bool&);
   ~UIStatusBar();
  protected:
   void Init();
   void UnInit();
-  void Open();
-  void Close();
+  void Create() override final;
+  void Destory() override final;
   const HWND& Hwnd() const;
   bool IsOpen() const;
  protected:
