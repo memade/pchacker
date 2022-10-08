@@ -11,6 +11,9 @@ namespace local {
  }
  void Configure::Finish() {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
+
+
+
 #if 0
   if (!m_ConfigureDataCache.empty())
    shared::Win::File::Write(m_ConfigureFilePathname, m_ConfigureDataCache);
