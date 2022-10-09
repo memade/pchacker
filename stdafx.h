@@ -17,9 +17,9 @@
 #include "cef3.hpp"
 #endif
 #if ENABLE_LIBCURLPP
-#include "../libcurlpp/libcurlpp.hpp"
+#include <libcurlpp.hpp>
 #endif
-#include "pchacker.hpp"
+#include <pchacker.hpp>
 using namespace pchacker;
 #include "local.h"
 #include "configure.h"

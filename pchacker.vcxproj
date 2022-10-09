@@ -48,7 +48,6 @@
     <ClInclude Include="Global.h" />
     <ClInclude Include="local.h" />
     <ClInclude Include="pchacker.h" />
-    <ClInclude Include="pchacker.hpp" />
     <ClInclude Include="Setup.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="uibase.h" />
