@@ -3,11 +3,27 @@
 
 namespace local {
 
-	class Setup final {
-	public:
-		Setup();
-		~Setup();
-	};
+ class Setup final {
+  std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
+ public:
+  class Server final {
+  public:
+   std::string IPAddr;
+   std::uint16_t Port = 0;
+  };
+ public:
+  Setup(const std::string& setup_xml_pathname);
+  ~Setup();
+ private:
+  void Init();
+  void UnInit();
+ public:
+  const Server& ServerGet() const;
+ private:
+  std::atomic_bool m_Ready = false;
+  Server m_Server;
+  const std::string m_SetupXmlPathname;
+ };
 
 }///namespace local
 

@@ -23,9 +23,9 @@ namespace local {
   DownTaskPaused = int(EnDownActionType::Pause),
   DownTaskStop = int(EnDownActionType::Stop),
   Downing = int(EnDownActionType::Beworking),
-  InPreparation= int(EnDownActionType::End)+1,
-  NetworkDisconnection= InPreparation+1,
-  DownTaskReady= InPreparation+2,
+  InPreparation = int(EnDownActionType::End) + 1,
+  NetworkDisconnection = InPreparation + 1,
+  DownTaskReady = InPreparation + 2,
  };
 
  static const std::map<CommonStringType, std::wstring> CommonStringMap = {
@@ -64,8 +64,18 @@ namespace local {
   }
  }ProgressRoute;
 
+}///namespace local
 
-}///namespace local 
+
+
+
+
+
+
+
+
+
+
 
 #if 0
 @brief  @param  @return @author @date @version是代码书写的一种规范
