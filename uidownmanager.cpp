@@ -266,6 +266,7 @@ namespace local {
 	bool UIDownManager::AppendDownTaskNode(TaskNode* pTaskNode) {
 		bool result = false;
 		std::lock_guard<std::mutex> lock{ *m_Mutex };
+#if 0
 		do {
 			if (!pTaskNode)
 				break;
@@ -283,6 +284,7 @@ namespace local {
 				break;
 			result = true;
 		} while (0);
+#endif
 		return result;
 	}
 }///namespace local

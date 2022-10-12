@@ -11,24 +11,6 @@ namespace local {
  private:
   void Init();
   void UnInit();
- private:
-  bool __DownTaskPerform(IDownTaskNode*);
- public:
-  bool StartsAutomaticallyWhenStarts() const override final;
-  bool LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup() const override final;
-  bool AutomaticallyInstalledAfterDownloading() const override final;
-  bool NoPromotionalAdsAreDisplayedWhenOpened() const override final;
-  bool NoMoreRemindersEverytimeItClosesInClickCloseBtn() const override final;
-  bool MinimizeToSystemTrayInClickCloseBtn() const override final;
-  bool ExitImmediatelyInClickCloseBtn() const override final;
-  const std::string& PathForStoringTheInstallationPackage() const override final;
-  const std::string& ProgramInstallationPath() const override final;
-  bool NolimitOnDownloadSpeed() const override final;
-  const unsigned int& DownloadSpeedThreshold() const override final;
-  bool InstallationPackageAutomaticallyDownloadedToDefaultPath() const override final;
-  const unsigned int& TheInstallationPackageIsReservedDays() const override final;
-  bool ShutDownAfterDownloading() const override final;
-  const unsigned int& DisableDelayInMinutes() const override final;
  public:
   void ParentHwndSet(const UIType&, const HWND&) override final;
   void* UIGetHwnd(const UIType&) const override final;
@@ -38,7 +20,7 @@ namespace local {
   void UIRefresh() const override final;
   void UIPositionSet(const UIType&, const ::tagPOINT&, const ::tagSIZE&) override final;
   HWND UICreate(const UIType&, const bool& show) override final;
-  IDownTaskNode* TaskCreate() override final;
+  IDownTaskNode* TaskCreate(const TypeID&) override final;
   bool TaskAction(const TypeID&, const DownActionType&) override final;
   bool TaskDestory(IDownTaskNode*) override final;
   bool TaskPerform(IDownTaskNode*) override final;
@@ -50,8 +32,8 @@ namespace local {
   bool OnDockingFormDockingData(DockingData*) override final;
   bool OnDockingFormHost(const std::wstring& json_data, const tfDockingMessageCb&) override final;
  protected:
-  void* GetLibcurlppHandle() const override final;
   bool OpenResourceCreateDaemonNode(const std::string&) override final;
+  void RegisterTaskResultStatusCallback(const tfTaskResultStatusCb&) override final;
  public:
   HWND ParentHwnd(const UIType&) const;
   const std::wstring& UISkinDirectory() const;
@@ -61,13 +43,17 @@ namespace local {
   std::vector<std::thread> m_Threads;
   std::atomic_bool m_IsOpen = false;
   std::map<UIType, UIBase*> m_UIMap;
-  shared::container::map<TypeID/*res(game) id*/, TaskNode*> m_DownTaskNodes;
-  std::vector<TaskNode*> m_DownTaskNodeCaches;
+  shared::container::map<TypeID/*res(game) id*/, TaskNode*> m_TaskPool;
   std::wstring m_CurrentUserDirectoryW;
   std::string m_CurrentUserDirectoryA;
   std::wstring m_SystemDirectoryW;
   std::string m_SystemDirectoryA;
   std::wstring m_UISkinDirectory;
+ protected:
+  bool Bit7zArchiveProcess() override final;
+  bool ZipArchiveProcess() override final;
+ private:
+  tfTaskResultStatusCb m_TaskResultStatusCb = nullptr;
  private:
   /// 安装包存储路径
   std::string m_PathForStoringTheInstallationPackage;
@@ -101,12 +87,22 @@ namespace local {
   bool m_ShutDownAfterDownloading = false;
   /// 关闭延迟分钟数
   unsigned int m_DisableDelayInMinutes = 240;
-
- protected:
-  bool Bit7zArchiveProcess() override final;
-  bool ZipArchiveProcess() override final;
- private:
-  libcurlpp::IHttpApi* m_pLibcurlHttpApi = nullptr;
+ public:
+  bool StartsAutomaticallyWhenStarts() const override final;
+  bool LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup() const override final;
+  bool AutomaticallyInstalledAfterDownloading() const override final;
+  bool NoPromotionalAdsAreDisplayedWhenOpened() const override final;
+  bool NoMoreRemindersEverytimeItClosesInClickCloseBtn() const override final;
+  bool MinimizeToSystemTrayInClickCloseBtn() const override final;
+  bool ExitImmediatelyInClickCloseBtn() const override final;
+  const std::string& PathForStoringTheInstallationPackage() const override final;
+  const std::string& ProgramInstallationPath() const override final;
+  bool NolimitOnDownloadSpeed() const override final;
+  const unsigned int& DownloadSpeedThreshold() const override final;
+  bool InstallationPackageAutomaticallyDownloadedToDefaultPath() const override final;
+  const unsigned int& TheInstallationPackageIsReservedDays() const override final;
+  bool ShutDownAfterDownloading() const override final;
+  const unsigned int& DisableDelayInMinutes() const override final;
  };
 
 }///namespace local 

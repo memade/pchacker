@@ -137,10 +137,22 @@ namespace local {
   } while (0);
  }
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
- TaskNode::TaskNode() {
-  //m_pRequestObj = Global::HttpGet()->CreateRequest();
+ TaskNode::TaskNode(const TypeID& task_id) :
+  ITaskCommonData(task_id),
+  m_pTaskResult(new TaskResult(task_id, this)),
+  m_pHeadRequest(Global::HttpGet()->CreateRequest()),
+  m_pReadyRequest(Global::HttpGet()->CreateRequest()),
+  m_pDownRequest(Global::HttpGet()->CreateRequest())
+ {
+
  }
- TaskNode::TaskNode(const std::string& gbk_json_data) {
+ TaskNode::TaskNode(const TypeID& task_id, const std::string& gbk_json_data) :
+  ITaskCommonData(task_id),
+  m_pTaskResult(new TaskResult(task_id, this)),
+  m_pHeadRequest(Global::HttpGet()->CreateRequest()),
+  m_pReadyRequest(Global::HttpGet()->CreateRequest()),
+  m_pDownRequest(Global::HttpGet()->CreateRequest())
+ {
   do {
    if (gbk_json_data.empty())
     break;
@@ -164,8 +176,10 @@ namespace local {
     break;
    if (doc.HasMember("vip") && doc["vip"].IsNumber())
     m_VipLevel = doc["vip"].GetUint();
+#if 0
    if (doc.HasMember("gameId") && doc["gameId"].IsNumber())
     m_ID = doc["gameId"].GetUint();
+#endif
    if (doc.HasMember("gameName") && doc["gameName"].IsString())
     m_Name = doc["gameName"].GetString();
    if (doc.HasMember("gameTime") && doc["gameTime"].IsNumber())
@@ -181,10 +195,11 @@ namespace local {
    if (doc.HasMember("account") && doc["account"].IsString())
     m_Account = doc["account"].GetString();
   } while (0);
-  //m_pRequestObj = Global::HttpGet()->CreateRequest();
  }
  TaskNode::~TaskNode() {
-
+  Global::HttpGet()->DestoryRequest(m_pHeadRequest);
+  Global::HttpGet()->DestoryRequest(m_pReadyRequest);
+  Global::HttpGet()->DestoryRequest(m_pDownRequest);
  }
  void TaskNode::LocalResDir(const std::string& path) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -194,11 +209,123 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_LocalResDir;
  }
+ void TaskNode::DownPath(const std::string& path) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_DownPath = path;
+ }
+ const TypeID& TaskResult::TaskID() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_ID;
+ }
+ const size_t& TaskResult::ContentLength() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_ContentLength;
+ }
+ void* TaskResult::RoutePtr() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_RoutePtr;
+ }
+ const long long& TaskResult::DownLimitSpeed() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_DownLimitSpeed;
+ }
+ void* TaskResult::BindUI() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_BindUI;
+ }
+ void TaskNode::DownLimitSpeed(const long long& speed_b/*b*/) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_DownLimitSpeed = speed_b;
+  m_pDownRequest->MaxRecvSpeedLarge(m_DownLimitSpeed);
+  m_pTaskResult->m_DownLimitSpeed = m_DownLimitSpeed;
+ }
+ void TaskNode::BindUI(void* bind_ui) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_BindUI = bind_ui;
+  m_pTaskResult->m_BindUI = bind_ui;
+ }
+ void TaskNode::RoutePtr(void* route_ptr) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_RoutePtr = route_ptr;
+  m_pTaskResult->m_RoutePtr = route_ptr;
+ }
+ EnTaskType TaskResult::TaskType() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_TaskType.load();
+ }
+ void TaskResult::operator<<(const libcurlpp::IProgressInfo* info) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  do {
+   if (!info)
+    break;
+   m_total = info->total();
+   m_current = info->current();
+   m_percentage = info->percentage();
+   auto time_s = info->time_s();
+   auto speed_s = info->speed_s();
+
+   if (time_s > 0)
+    m_time_s = time_s;
+   if (speed_s > 0)
+    m_speed_s = speed_s;
+  } while (0);
+ }
+ void TaskResult::operator<<(const libcurlpp::IResponse* res) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  do {
+   if (!res)
+    break;
+
+
+  } while (0);
+ }
+ const double& TaskResult::total() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_total;
+ }
+ const double& TaskResult::current() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_current;
+ }
+ const double& TaskResult::speed_s() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_speed_s;
+ }
+ const double& TaskResult::percentage() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_percentage;
+ }
+ const long long& TaskResult::time_s() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_time_s;
+ }
+ void* TaskResult::TaskNodePtr() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_pTaskNodePtr;
+ }
+ void TaskNode::TaskType(const EnTaskType& task_type) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_TaskType.store(task_type);
+  m_pTaskResult->m_TaskType.store(m_TaskType.load());
+ }
+ TaskResult* TaskNode::TaskResultGet() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_pTaskResult;
+ }
+ void TaskNode::DownPathname(const std::string& pathname) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_DownPathname = pathname;
+ }
+ void TaskNode::OpenCommandLine(const std::string& commandline) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_OpenCommandLine = commandline;
+ }
  void TaskNode::Name(const std::string& name) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_Name = name;
+  m_pTaskResult->m_Name = m_Name;
  }
- const std::string& TaskNode::Name() const {
+ const std::string& TaskResult::Name() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_Name;
  }
@@ -216,16 +343,11 @@ namespace local {
    //TODO : Further padding is required here
 
 #endif
-
    result = true;
-  } while (0);
-  return result;
- }
- void TaskNode::ID(const TypeID& id) {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_ID = id;
- }
- TypeID TaskNode::ID() const {
+} while (0);
+return result;
+}
+ const TypeID& TaskNode::ID() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ID;
  }
@@ -243,29 +365,21 @@ namespace local {
   } while (0);
   return result;
  }
- IDownTaskElement* TaskNode::UIDownTaskElementCreate() {
+ EnActionType TaskNode::Status() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  CDialogBuilder builder;
-  m_pUIDownTaskElement = builder.Create<IDownTaskElement>(LR"(nodes\uidwontasknode.xml)");
-  if (!m_Name.empty())
-   m_pUIDownTaskElement->SetName(shared::IConv::MBytesToWString(m_Name));
-  return m_pUIDownTaskElement;
- }
- IDownTaskElement* TaskNode::UIDownTaskElementGet() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_pUIDownTaskElement;
- }
- EnTaskStatus TaskNode::Status() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_Status;
- }
- void TaskNode::Status(const EnTaskStatus& status) {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_Status = status;
+  return m_ActionType.load();
  }
  void TaskNode::Url(const std::string& url) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_Url = url;
+  if (m_pDownRequest)
+   m_pHeadRequest->RequestUrl(url);
+  m_pDownRequest->RequestUrl(url);
+ }
+ void TaskNode::LogoUrl(const std::string& url) {
+  m_LogoUrl = url;
+  if (m_pReadyRequest)
+   m_pReadyRequest->RequestUrl(m_LogoUrl);
  }
  const std::string& TaskNode::Url() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -278,18 +392,120 @@ namespace local {
  void TaskNode::VipLevel(const unsigned int& level) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_VipLevel = level;
+  m_pTaskResult->m_VipLevel = m_VipLevel;
  }
- void TaskNode::Logo(const std::string& logo_buffer) {
+ void TaskNode::LogoPathname(const std::string& logo_buffer) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_LogoPathname = logo_buffer;
  }
- const std::string& TaskNode::Logo() const {
+ const std::string& TaskResult::LogoPathname() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_LogoPathname;
  }
+ const unsigned int& TaskResult::VipLevel() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_VipLevel;
+ }
+ EnActionType TaskResult::Status() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_ActionType.load();
+ }
  void TaskNode::Action(const DownActionType& type) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
+  if (type == DownActionType::Start && m_ActionType.load() == DownActionType::Beworking)
+   return;
   m_ActionType.store(type);
+  m_pTaskResult->m_ActionType.store(m_ActionType.load());
+ }
+
+ bool TaskNode::Perform() {
+  bool result = false;
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  do {
+   if (!m_pDownRequest)
+    break;
+   m_pDownRequest->Header(false);
+   m_pDownRequest->RequestType(libcurlpp::EnRequestType::REQUEST_TYPE_GET);
+   m_pDownRequest->CachePathname(m_DownCacheFilePathname);
+   m_pDownRequest->ProgressCb(
+    [&](const libcurlpp::IProgressInfo* pDownProgressInfo, const libcurlpp::IProgressInfo*)->libcurlpp::ProgressActionType {
+     *m_pTaskResult << pDownProgressInfo;
+     return libcurlpp::ProgressActionType::Continue;
+    });
+   m_pDownRequest->FinishCb(
+    [&](const libcurlpp::IResponse* resObj) {
+     *m_pTaskResult << resObj;
+    });
+   m_pDownRequest->Action(libcurlpp::EnRequestAction::Start);
+   result = true;
+  } while (0);
+  return result;
+ }
+ bool TaskNode::Preparation() {
+  bool result = false;
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  do {
+   if (!m_pDownRequest || !m_pReadyRequest)
+    break;
+   if (m_ID <= 0)
+    break;
+   if (m_Url.empty())
+    break;
+   std::string file_name;
+   std::string file_format;
+   shared::Win::GetFileNameAndFormat(m_LogoUrl, file_name, file_format);
+   m_LogoPathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\logos\\" + std::to_string(m_ID) + file_format);
+   //!@ 初始化最终下载文件名
+   shared::Win::GetFileNameAndFormat(m_Url, file_name, file_format);
+   m_FinishPathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\finishs\\" + std::to_string(m_ID) + file_format);
+   //!@ 初始化下载缓冲文件路径名
+   m_DownCacheFilePathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\caches\\" + std::to_string(m_ID) + file_format);
+
+   m_pReadyRequest->HeadersAdd(R"(content-type: application/x-www-form-urlencoded)");
+   m_pReadyRequest->FinishCb(
+    [&](const libcurlpp::IResponse* resObj) {
+     do {
+      if (resObj->HttpCode() != 200)
+       break;
+      const auto& body = resObj->Body();
+      if (body.empty())
+       break;
+      shared::Win::File::Write(m_LogoPathname, body);
+      m_pTaskResult->m_LogoPathname = m_LogoPathname;
+     } while (0);
+    });
+   m_pHeadRequest->Header(true);
+   m_pHeadRequest->RequestType(libcurlpp::EnRequestType::REQUEST_TYPE_HEAD);
+   m_pHeadRequest->FinishCb(
+    [&](const libcurlpp::IResponse* resObj) {
+     do {
+      if (resObj->HttpCode() != 200)
+       break;
+      m_ContentLength = resObj->ContentLength();
+      m_pTaskResult->m_ContentLength = m_ContentLength;
+      result = true;
+     } while (0);
+    });
+
+   Global::HttpGet()->PerformM({ m_pReadyRequest,m_pHeadRequest });
+  } while (0);
+  return result;
+ }
+
+
+
+#if 0
+ IDownTaskElement* TaskNode::UIDownTaskElementCreate() {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  CDialogBuilder builder;
+  m_pUIDownTaskElement = builder.Create<IDownTaskElement>(LR"(nodes\uidwontasknode.xml)");
+  if (!m_Name.empty())
+   m_pUIDownTaskElement->SetName(shared::IConv::MBytesToWString(m_Name));
+  return m_pUIDownTaskElement;
+ }
+ IDownTaskElement* TaskNode::UIDownTaskElementGet() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_pUIDownTaskElement;
  }
  DownActionType TaskNode::Action() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -310,7 +526,6 @@ namespace local {
     m_IsOpenThread.store(true);
     m_Threads.emplace_back([this]() {OnProgressChanged(); });
    }
-
    //!@ 任务节点开始下载
    auto pReqObj = Global::PCDownGet()->HttpObj()->RouteCreate();
    if (!pReqObj)
@@ -580,4 +795,15 @@ namespace local {
    prev_time_mark += 100;
   } while (1);
  }
+
+
+
+#endif
+
+
+
+
+
+
+
 }///namespace lcoal

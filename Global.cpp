@@ -22,9 +22,9 @@ namespace local {
 			if (!m_pCef3Obj)
 				break;
 #endif
-			/*m_pHttpObj = malware::http::IHttpApi::CreateInterface((shared::Win::GetModulePathA(__gpHinstance) + "malware.dll").c_str());
+			m_pHttpObj = libcurlpp::IHttpApi::CreateInterface((shared::Win::GetModulePathA(__gpHinstance) + "libcurlpp.dll").c_str());
 			if (!m_pHttpObj)
-				break;*/
+				break;
 			m_pPCHacker = new PCHacker();
 			m_Ready.store(true);
 		} while (0);
@@ -33,7 +33,7 @@ namespace local {
 
 	void Global::UnInit() {
 		SK_DELETE_PTR(m_pPCHacker);
-		//malware::http::IHttpApi::DestoryInterface(m_pHttpObj);
+		libcurlpp::IHttpApi::DestoryInterface(m_pHttpObj);
 #if ENABLE_MODULE_CEF3
 		shared::cef3::ICef3Api::DestoryInterface(m_pCef3Obj);
 #endif
@@ -49,15 +49,15 @@ namespace local {
 		} while (0);
 		return result;
 	}
-	/*malware::http::IHttpApi* Global::HttpGet() {
-		malware::http::IHttpApi* result = nullptr;
+	libcurlpp::IHttpApi* Global::HttpGet() {
+		libcurlpp::IHttpApi* result = nullptr;
 		do {
 			if (!__gpGlobal)
 				break;
 			result = __gpGlobal->m_pHttpObj;
 		} while (0);
 		return result;
-	}*/
+	}
 #if ENABLE_MODULE_CEF3
 	shared::cef3::ICef3Api* Global::Cef3Get() {
 		shared::cef3::ICef3Api* result = nullptr;

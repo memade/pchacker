@@ -6,6 +6,7 @@
 #define ENABLE_LIBCURLPP 1
 
 #include <win.h>
+#include <spdlog.hpp>
 #include <zip++.h>
 #include <rapidjson.h>
 #include <rapidxml.h>

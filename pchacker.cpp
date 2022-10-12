@@ -11,14 +11,10 @@ namespace local {
   return m_UISkinDirectory;
  }
  void PCHacker::Init() {
-
-#if ENABLE_LIBCURLPP
-#ifdef _DEBUG
-  m_pLibcurlHttpApi = libcurlpp::IHttpApi::CreateInterface((shared::Win::GetModulePathA(__gpHinstance) + "libcurlpp.dll").c_str());
-#else
-  m_pLibcurlHttpApi = libcurlpp::IHttpApi::CreateInterface("libcurlpp.dll");
-#endif
-#endif
+  //!@ 创建项目日志记录仪
+  shared::ISpdlog::CreateInterface(
+   shared::Win::GetModuleNameA(),
+   shared::Win::GetModulePathA() + "\\logs\\");
 
   m_SystemDirectoryW = shared::Win::PathFixedW(\
    shared::Win::GetModulePathW(__gpHinstance) + L"\\" + shared::Win::GetModuleNameW(true, __gpHinstance) + L"\\");
@@ -67,9 +63,10 @@ namespace local {
   m_Threads.clear();
   ::CoUninitialize();
 
-#if ENABLE_LIBCURLPP
-  libcurlpp::IHttpApi::DestoryInterface(m_pLibcurlHttpApi);
-#endif
+
+
+  //!@ 销毁项目日志记录仪
+  shared::ISpdlog::DestoryInterface();
  }
  bool PCHacker::OnDockingFormDockingData(DockingData* pDockingData) {
   bool result = false;
@@ -133,8 +130,8 @@ namespace local {
     std::string js_function_param_gbk = shared::IConv::UTF8ToMBytes(js_function_param_utf8);
     if (js_function_param_gbk.empty())
      break;
-    auto pTask = new TaskNode(js_function_param_gbk);
-    result = __DownTaskPerform(pTask);
+    auto pTask = new TaskNode(0, js_function_param_gbk);
+    //result = __DownTaskPerform(pTask);
     if (!result)
      SK_DELETE_PTR(pTask);
 
@@ -159,7 +156,7 @@ namespace local {
    docking_msg_cb(dockingMsg, dockingResult, result_data);
   return result;
  }
-
+#if 0
  bool PCHacker::__DownTaskPerform(IDownTaskNode* pTask) {
   bool result = false;
   do {
@@ -185,12 +182,15 @@ namespace local {
   } while (0);
   return result;
  }
+#endif
  bool PCHacker::TaskPerform(IDownTaskNode* pTask) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return __DownTaskPerform(pTask);
+  //return __DownTaskPerform(pTask);
+  return false;
  }
  bool PCHacker::TaskDestory(IDownTaskNode* pTask) {
   bool result = false;
+#if 0
   do {
    auto pRemoveObj = dynamic_cast<TaskNode*>(pTask);
    auto found = std::find(m_DownTaskNodeCaches.begin(), m_DownTaskNodeCaches.end(), pRemoveObj);
@@ -200,21 +200,23 @@ namespace local {
    m_DownTaskNodeCaches.erase(found);
    result = true;
   } while (0);
+#endif
   return result;
  }
  bool PCHacker::TaskAction(const TypeID& resid, const DownActionType& action) {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  result = m_DownTaskNodes.search(resid,
+  result = m_TaskPool.search(resid,
    [&](TaskNode* pTask) {
     pTask->Action(action);
    });
   return result;
  }
- IDownTaskNode* PCHacker::TaskCreate() {
+ IDownTaskNode* PCHacker::TaskCreate(const TypeID& task_id) {
   IDownTaskNode* result = nullptr;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  result = dynamic_cast<IDownTaskNode*>(m_DownTaskNodeCaches.emplace_back(new TaskNode()));
+  result = new TaskNode(task_id);
+  m_TaskPool.push(task_id, dynamic_cast<TaskNode*>(result));
   return result;
  }
  HWND PCHacker::UICreate(const UIType& uitype, const bool& show) {
@@ -360,13 +362,9 @@ namespace local {
   return result;
  }
 
- void* PCHacker::GetLibcurlppHandle() const {
-  void* result = nullptr;
+ void PCHacker::RegisterTaskResultStatusCallback(const tfTaskResultStatusCb& task_status_cb) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  do {
-   result = m_pLibcurlHttpApi;
-  } while (0);
-  return result;
+  m_TaskResultStatusCb = task_status_cb;
  }
  bool PCHacker::OpenResourceCreateDaemonNode(const std::string& ResourcePathname) {
   bool result = false;
@@ -403,141 +401,6 @@ namespace local {
   /*std::lock_guard<std::mutex> lock{ *m_Mutex };*/
   return m_CurrentUserDirectoryA;
  }
- void PCHacker::Process() {
-#if ENABLE_MODULE_UI
-  UIBase* pUIDownMgr = nullptr;
-  UIBase* pUIStatusbar = nullptr;
-#endif
-
-  std::vector<TaskNode*> RemoveTasks;
-  do {
-   do {
-    if (m_DownTaskNodes.empty())
-     break;
-    do {
-#if ENABLE_MODULE_UI
-     if (pUIStatusbar)
-      break;
-     auto found_ui = m_UIMap.find(EnUIType::StatusBarUI);
-     if (found_ui == m_UIMap.end())
-      break;
-     pUIStatusbar = found_ui->second;
-    } while (0);
-    if (!pUIStatusbar)
-     break;
-#endif
-    m_DownTaskNodes.iterate_clear(
-     [&](const TypeID& identify, TaskNode* pTaskNode, bool& itbreak, bool& itclear) {
-      switch (pTaskNode->Action()) {
-      case EnDownActionType::Normal: {
-
-      }break;
-      case EnDownActionType::Append: {
-       if (pTaskNode->UIDownTaskElementGet())
-        break;
-
-#if ENABLE_MODULE_UI
-       if (!pUIDownMgr) {
-        auto found_ui_downmgr = m_UIMap.find(EnUIType::DownManagerUI);
-        if (found_ui_downmgr == m_UIMap.end())
-         break;
-        pUIDownMgr = found_ui_downmgr->second;
-       }
-       if (!pUIDownMgr)
-        break;
-       if (!pUIDownMgr->AppendDownTaskNode(pTaskNode))
-        break;
-#endif
-       pTaskNode->Action(EnDownActionType::Preparation);
-      }break;
-      case EnDownActionType::Preparation: {
-       if (pTaskNode->Status() == EnTaskStatus::InPreparation)
-        break;
-       pTaskNode->Status(EnTaskStatus::InPreparation);
-       do {
-        if (!pTaskNode->Preparation())
-         break;
-
-        pTaskNode->Action(EnDownActionType::Ready);
-       } while (0);
-      }break;
-      case EnDownActionType::Ready: {
-       pTaskNode->Action(EnDownActionType::Start);
-      }break;
-      case EnDownActionType::Pause: {
-       pTaskNode->Stop();
-      }break;
-      case EnDownActionType::Remove: {
-       itclear = true;
-       RemoveTasks.emplace_back(pTaskNode);
-      }break;
-      case EnDownActionType::Reset: {
-       auto sk = 0;
-      }break;
-      case EnDownActionType::Start: {
-       do {
-        if (!pTaskNode->Start())
-         break;
-
-
-       } while (0);
-      }break;
-      case EnDownActionType::Stop: {
-       auto sk = 0;
-      }break;
-      case EnDownActionType::Waitinline: {
-       auto sk = 0;
-      }break;
-      default:
-       break;
-      }
-
-     });
-    } while (0);
-
-
-#if ENABLE_MODULE_UI
-    do {//!@ 实时检测下载任务总数
-     if (!pUIStatusbar || !pUIDownMgr)
-      break;
-     auto dwon_task_total = pUIDownMgr->UIListDownTaskCount();
-     /// 如果下载任务不为空就切换到下载列表分页，否则切换到下载空提示分页
-     if (dwon_task_total > 0)
-      pUIDownMgr->SwitchPage(EnChildPageType::Normal);
-     else
-      pUIDownMgr->SwitchPage(EnChildPageType::Empty);
-     pUIStatusbar->DownStatusTotalCount(dwon_task_total);
-
-
-     //!@ 需要移除的任务
-     for (auto it = RemoveTasks.begin(); it != RemoveTasks.end();) {
-      pUIDownMgr->RemoveDownTaskNode(*it);
-      SK_DELETE_PTR(*it);
-      it = RemoveTasks.erase(it);
-     }
-#endif
-
-
-   } while (0);
-
-
-
-
-
-
-   if (!m_IsOpen.load())
-    break;
-   std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  } while (1);
- }
-
-
-
-
-
-
-
-
 
 
 

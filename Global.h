@@ -13,10 +13,10 @@ namespace local {
 		void UnInit();
 	public:
 		static PCHacker* PCHackerGet();
-		/*static malware::http::IHttpApi* HttpGet();*/
+		static libcurlpp::IHttpApi* HttpGet();
 	private:
 		PCHacker* m_pPCHacker = nullptr;
-		//malware::http::IHttpApi* m_pHttpObj = nullptr;
+		libcurlpp::IHttpApi* m_pHttpObj = nullptr;
 		std::atomic_bool m_Ready = false;
 
 #if ENABLE_MODULE_CEF3

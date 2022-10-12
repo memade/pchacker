@@ -19,6 +19,7 @@ namespace local {
   Blue,
  };
 
+#if 0
  enum class CommonStringType {
   DownTaskPaused = int(EnDownActionType::Pause),
   DownTaskStop = int(EnDownActionType::Stop),
@@ -27,7 +28,6 @@ namespace local {
   NetworkDisconnection = InPreparation + 1,
   DownTaskReady = InPreparation + 2,
  };
-
  static const std::map<CommonStringType, std::wstring> CommonStringMap = {
   {CommonStringType::InPreparation,LR"(正在准备)"},
   {CommonStringType::NetworkDisconnection,LR"(网络断开)"},
@@ -36,6 +36,7 @@ namespace local {
   {CommonStringType::DownTaskStop,LR"(任务停止)"},
   {CommonStringType::Downing,LR"(正在下载)"},
  };
+#endif
 
  static const std::map<CommonColorType, DWORD> CommonColorMap = {
  {CommonColorType::Red,RGB(255,0,0)},

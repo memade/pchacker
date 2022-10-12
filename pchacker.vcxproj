@@ -25,6 +25,7 @@
     <ClCompile Include="export.cpp" />
     <ClCompile Include="Global.cpp" />
     <ClCompile Include="pchacker.cpp" />
+    <ClCompile Include="process.cpp" />
     <ClCompile Include="Setup.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -150,7 +151,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -183,7 +184,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -215,7 +216,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <Optimization>Full</Optimization>
@@ -255,7 +256,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <Optimization>MaxSpeed</Optimization>
