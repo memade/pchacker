@@ -169,7 +169,7 @@ namespace local {
 				do {
 					if (!parent)
 						break;
-					Global::PCHackerGet()->TaskAction(parent->GetTagUINT64(),EnDownActionType::Remove);
+					Global::PCHackerGet()->TaskAction(parent->GetTagUINT64(),EnActionType::DownRemove);
 				} while (0);
 			}
 			else if (msg.pSender->GetName() == L"06A057E7350B") {//!@ 下载任务节点暂停/停止 | 开始/启动
@@ -178,7 +178,7 @@ namespace local {
 				do {
 					if (!parent)
 						break;
-					Global::PCHackerGet()->TaskAction(parent->GetTagUINT64(), running ? EnDownActionType::Pause : EnDownActionType::Preparation);
+					Global::PCHackerGet()->TaskAction(parent->GetTagUINT64(), running ? EnActionType::DownPause : EnActionType::DownPreparation);
 				} while (0);
 			}
 			else if (msg.pSender->GetName() == L"D90336733AF1") {//!@ 下载任务节点重置
@@ -186,7 +186,7 @@ namespace local {
 				do {
 					if (!parent)
 						break;
-					Global::PCHackerGet()->TaskAction(parent->GetTagUINT64(), EnDownActionType::Reset);
+					Global::PCHackerGet()->TaskAction(parent->GetTagUINT64(), EnActionType::DownReset);
 				} while (0);
 			}
 			else if (msg.pSender == m_pUIOptionDowning) {

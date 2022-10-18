@@ -1,145 +1,9 @@
 ﻿#include "stdafx.h"
 
 namespace local {
- ///////////////////////////////////////////////////////////////////////////////////////////////////////////
- void IDownTaskElement::SetDownDownTimeRemain(const size_t& size_remain,
-  const size_t& current_down_speed_value /*= NormalUserLimitDownSpeedValue*/, const DWORD& color /*= 0*/) {
-  do {
-   auto ui = GetSubCtrl<CLabelUI>(L"D1C4FD362124");
-   if (!ui)
-    break;
-   std::wstring time_text = L"--:--:--";
-   if (size_remain > 0 && current_down_speed_value > 0) {
-    time_t total_s = size_remain / current_down_speed_value;
-    time_text = shared::IConv::MBytesToWString(shared::Win::Time::TimePeriodUnMade(static_cast<UINT>(total_s)));
-   }
-   ui->SetText(time_text.c_str());
-   if (color)
-    ui->SetTextColor(color);
-  } while (0);
- }
- void IDownTaskElement::SetDownloadCompletionRate(const size_t& total, const size_t& current) {
-  std::wstring text = L"0.0%";
-  CLabelUI* ui_label = nullptr;
-  CProgressUI* ui_progress = nullptr;
-  do {
-   ui_progress = GetSubCtrl<CProgressUI>(L"90352B27A442");
-   ui_label = GetSubCtrl<CLabelUI>(L"56E157AE72A8");
-   if (!ui_progress || !ui_label)
-    break;
-   if (total <= 0 || current <= 0)
-    break;
-   const auto max = ui_progress->GetMaxValue();
-   double current_progress = (current * 1.0) / (total * 1.0);
-   int value = static_cast<int>(current_progress * max);
-   double RatioProgress = current_progress * max / 100.0;
-   text = std::format(L"{:.2f}%", RatioProgress);
-  } while (0);
-  if (ui_label)
-   ui_label->SetText(text.c_str());
- }
- void IDownTaskElement::StartingSwitch(const bool& status) {
-  do {
-   auto ui = GetSubCtrl<COptionUI>(L"06A057E7350B");
-   if (!ui)
-    break;
-   auto current_status = ui->IsSelected();
-   if (current_status == status)
-    break;
-   ui->Selected(status);
-  } while (0);
- }
- void IDownTaskElement::SetLogo(const std::wstring& logo_pathname) {
-  do {
-   if (!shared::Win::AccessW(logo_pathname))
-    break;
-   auto ui = GetSubCtrl<CLabelUI>(L"CCB822F77204");
-   if (!ui)
-    break;
-   ui->SetBkImage(logo_pathname.c_str());
-  } while (0);
- }
- void IDownTaskElement::SetDownSpeedValueVip(const size_t& real_speed/*-NormalUserLimitDownSpeedValue*/) {
-  do {
-   auto ui = GetSubCtrl<CLabelUI>(L"F5E1F8FAD133");
-   if (!ui)
-    break;
-   auto speed = shared::Win::RealtimeSpeed(real_speed);
-   ui->SetText(shared::IConv::MBytesToWString(speed).c_str());
-  } while (0);
- }
- void IDownTaskElement::SetDownSpeedValue(const size_t& value) {
-  do {
-   auto ui = GetSubCtrl<CLabelUI>(L"76E1ED97A767");
-   if (!ui)
-    break;
-   auto speed = shared::Win::RealtimeSpeed(value);
-   ui->SetText(shared::IConv::MBytesToWString(speed).c_str());
-  } while (0);
- }
- void IDownTaskElement::SetProgressValue(const size_t& total, const size_t& current) {
-  do {
-   if (total <= 0 || current <= 0)
-    break;
-   auto ui = GetSubCtrl<CProgressUI>(L"90352B27A442");
-   if (!ui)
-    break;
-   const auto max = ui->GetMaxValue();
-   double current_progress = (current * 1.0) / (total * 1.0);
-   int value = static_cast<int>(current_progress * max);
-   ui->SetValue(static_cast<int>(value));
-  } while (0);
- }
- void IDownTaskElement::SetName(const std::wstring& name, const DWORD& color) {
-  do {
-   auto ui = GetSubCtrl<CLabelUI>(L"DD0FB204BE1D");
-   if (!ui)
-    break;
-   ui->SetText(name.c_str());
-   if (color)
-    ui->SetTextColor(color);
-  } while (0);
- }
- void IDownTaskElement::StatusTextSet(const std::wstring& text, const DWORD& color) {
-  do {
-   auto ui = GetSubCtrl<CLabelUI>(L"E509EB1128BD");
-   if (!ui)
-    break;
-   ui->SetText(text.c_str());
-   if (color)
-    ui->SetTextColor(color);
-  } while (0);
- }
- void IDownTaskElement::ResourceSizeTextSet(const size_t& total, const size_t& current, const DWORD& color) {
-  do {
-   auto ui = GetSubCtrl<CLabelUI>(L"E4BD5BC33011");
-   if (!ui)
-    break;
-   if (total <= 0 && current <= 0) {
-    ui->SetText(L"--/--");
-    break;
-   }
-   auto realTotal = shared::Win::RealtimeSpeed(total);
-   auto realCurrent = shared::Win::RealtimeSpeed(current);
-   ui->SetText(std::format(L"{}/{}", shared::IConv::MBytesToWString(realCurrent), shared::IConv::MBytesToWString(realTotal)).c_str());
-   if (color)
-    ui->SetTextColor(color);
-  } while (0);
- }
- void IDownTaskElement::DownTotalTimeTextSet(const std::wstring& text, const DWORD& color) {
-  do {
-   auto ui = GetSubCtrl<CLabelUI>(L"D1C4FD362124");
-   if (!ui)
-    break;
-   ui->SetText(text.c_str());
-   if (color)
-    ui->SetTextColor(color);
-  } while (0);
- }
- ///////////////////////////////////////////////////////////////////////////////////////////////////////////
  TaskNode::TaskNode(const TypeID& task_id) :
   ITaskCommonData(task_id),
-  m_pTaskResult(new TaskResult(task_id, this)),
+  m_pTaskResult(new TaskResult()),
   m_pHeadRequest(Global::HttpGet()->CreateRequest()),
   m_pReadyRequest(Global::HttpGet()->CreateRequest()),
   m_pDownRequest(Global::HttpGet()->CreateRequest())
@@ -148,7 +12,7 @@ namespace local {
  }
  TaskNode::TaskNode(const TypeID& task_id, const std::string& gbk_json_data) :
   ITaskCommonData(task_id),
-  m_pTaskResult(new TaskResult(task_id, this)),
+  m_pTaskResult(new TaskResult()),
   m_pHeadRequest(Global::HttpGet()->CreateRequest()),
   m_pReadyRequest(Global::HttpGet()->CreateRequest()),
   m_pDownRequest(Global::HttpGet()->CreateRequest())
@@ -201,6 +65,9 @@ namespace local {
   Global::HttpGet()->DestoryRequest(m_pReadyRequest);
   Global::HttpGet()->DestoryRequest(m_pDownRequest);
  }
+ void TaskNode::Release() const {
+  delete this;
+ }
  void TaskNode::LocalResDir(const std::string& path) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_LocalResDir = path;
@@ -213,61 +80,59 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_DownPath = path;
  }
- const TypeID& TaskResult::TaskID() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_ID;
- }
- const size_t& TaskResult::ContentLength() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_ContentLength;
- }
- void* TaskResult::RoutePtr() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_RoutePtr;
- }
- const long long& TaskResult::DownLimitSpeed() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_DownLimitSpeed;
- }
- void* TaskResult::BindUI() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_BindUI;
- }
  void TaskNode::DownLimitSpeed(const long long& speed_b/*b*/) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_DownLimitSpeed = speed_b;
   m_pDownRequest->MaxRecvSpeedLarge(m_DownLimitSpeed);
-  m_pTaskResult->m_DownLimitSpeed = m_DownLimitSpeed;
+ }
+ void* TaskNode::RoutePtr() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_RoutePtr;
+ }
+ void TaskNode::BindUI2(void* bindui2) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_BindUI2 = bindui2;
+ }
+ void* TaskNode::BindUI2() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_BindUI2;
+ }
+ void TaskNode::BindPtr(void* ptr) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_BindPtr = ptr;
+ }
+ void* TaskNode::BindPtr() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_BindPtr;
+ }
+
+ void* TaskNode::BindUI() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_BindUI;
  }
  void TaskNode::BindUI(void* bind_ui) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_BindUI = bind_ui;
-  m_pTaskResult->m_BindUI = bind_ui;
  }
  void TaskNode::RoutePtr(void* route_ptr) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_RoutePtr = route_ptr;
-  m_pTaskResult->m_RoutePtr = route_ptr;
- }
- EnTaskType TaskResult::TaskType() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_TaskType.load();
  }
  void TaskResult::operator<<(const libcurlpp::IProgressInfo* info) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
    if (!info)
     break;
-   m_total = info->total();
-   m_current = info->current();
-   m_percentage = info->percentage();
+   m_down_total = info->total();
+   m_down_current = info->current();
+   m_down_percentage = info->percentage();
    auto time_s = info->time_s();
    auto speed_s = info->speed_s();
 
    if (time_s > 0)
-    m_time_s = time_s;
+    m_down_time_s = time_s;
    if (speed_s > 0)
-    m_speed_s = speed_s;
+    m_down_speed_s = speed_s;
   } while (0);
  }
  void TaskResult::operator<<(const libcurlpp::IResponse* res) {
@@ -279,38 +144,69 @@ namespace local {
 
   } while (0);
  }
- const double& TaskResult::total() const {
+ const std::string& TaskResult::FinishPath() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_total;
+  return m_FinishPath;
  }
- const double& TaskResult::current() const {
+ const std::string& TaskResult::FinishPathname() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_current;
+  return m_FinishPathname;
  }
- const double& TaskResult::speed_s() const {
+ const double& TaskResult::down_total() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_speed_s;
+  return m_down_total;
  }
- const double& TaskResult::percentage() const {
+ const double& TaskResult::down_current() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_percentage;
+  return m_down_current;
  }
- const long long& TaskResult::time_s() const {
+ const double& TaskResult::down_speed_s() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_time_s;
+  return m_down_speed_s;
  }
- void* TaskResult::TaskNodePtr() const {
+ const double& TaskResult::down_percentage() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_pTaskNodePtr;
+  return m_down_percentage;
+ }
+ const long long& TaskResult::down_time_s() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_down_time_s;
+ }
+ const long long& TaskResult::extract_total() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_extract_total;
+ }
+ void TaskResult::operator<<(const tagTaskmanMsg::tagDetails& details) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_FinishPath = shared::Win::GetPathByPathnameA(details.StartupPEPathname);
+  m_FinishPathname = details.StartupPEPathname;
+ }
+ void TaskResult::operator<<(const EXTRACTPROGRESSINFO& extract_progress_info) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_extract_total = extract_progress_info.extract_total;
+  m_extract_current = extract_progress_info.extract_current;
+  m_extract_time_s = extract_progress_info.extract_time_s;
+  m_extract_percentage = extract_progress_info.extract_percentage;
+ }
+ const long long& TaskResult::extract_current() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_extract_current;
+ }
+ const long long& TaskResult::extract_percentage() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_extract_percentage;
+ }
+ const long long& TaskResult::extract_time_s() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_extract_time_s;
  }
  void TaskNode::TaskType(const EnTaskType& task_type) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_TaskType.store(task_type);
-  m_pTaskResult->m_TaskType.store(m_TaskType.load());
  }
- TaskResult* TaskNode::TaskResultGet() const {
+ ITaskResultStatus* TaskNode::Result() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_pTaskResult;
+  return dynamic_cast<ITaskResultStatus*>(m_pTaskResult);
  }
  void TaskNode::DownPathname(const std::string& pathname) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -320,14 +216,23 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_OpenCommandLine = commandline;
  }
+ const std::string& TaskNode::Name() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_Name;
+ }
  void TaskNode::Name(const std::string& name) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_Name = name;
-  m_pTaskResult->m_Name = m_Name;
  }
- const std::string& TaskResult::Name() const {
+ void TaskNode::operator<<(const tagTaskmanMsg::tagDetails& details) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_Name;
+  if (m_pTaskResult)
+   *m_pTaskResult << details;
+ }
+ void TaskNode::operator<<(const EXTRACTPROGRESSINFO& progress_info) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  if (m_pTaskResult)
+   *m_pTaskResult << progress_info;
  }
  bool TaskNode::operator<<(const DockingData& dockingData) {
   bool result = false;
@@ -344,9 +249,9 @@ namespace local {
 
 #endif
    result = true;
-} while (0);
-return result;
-}
+  } while (0);
+  return result;
+ }
  const TypeID& TaskNode::ID() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ID;
@@ -365,10 +270,6 @@ return result;
   } while (0);
   return result;
  }
- EnActionType TaskNode::Status() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_ActionType.load();
- }
  void TaskNode::Url(const std::string& url) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_Url = url;
@@ -376,7 +277,12 @@ return result;
    m_pHeadRequest->RequestUrl(url);
   m_pDownRequest->RequestUrl(url);
  }
+ const std::string& TaskNode::LogoUrl() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_LogoUrl;
+ }
  void TaskNode::LogoUrl(const std::string& url) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_LogoUrl = url;
   if (m_pReadyRequest)
    m_pReadyRequest->RequestUrl(m_LogoUrl);
@@ -392,58 +298,185 @@ return result;
  void TaskNode::VipLevel(const unsigned int& level) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_VipLevel = level;
-  m_pTaskResult->m_VipLevel = m_VipLevel;
+ }
+ const std::string& TaskNode::LogoPathname() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_LogoPathname;
  }
  void TaskNode::LogoPathname(const std::string& logo_buffer) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_LogoPathname = logo_buffer;
  }
- const std::string& TaskResult::LogoPathname() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_LogoPathname;
- }
- const unsigned int& TaskResult::VipLevel() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_VipLevel;
- }
- EnActionType TaskResult::Status() const {
+ EnActionType TaskNode::Action() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ActionType.load();
  }
- void TaskNode::Action(const DownActionType& type) {
+ EnActionType TaskNode::ActionPrev() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  if (type == DownActionType::Start && m_ActionType.load() == DownActionType::Beworking)
-   return;
-  m_ActionType.store(type);
-  m_pTaskResult->m_ActionType.store(m_ActionType.load());
+  return m_ActionTypePrev.load();
  }
+ EnActionType TaskNode::StatusPrev() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_ActionTypePrev.load();
+ }
+ EnActionType TaskNode::Status() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_ActionType.load();
+ }
+ void TaskNode::Action(const EnActionType& set_action) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_ActionTypePrev.store(m_ActionType.load());
+#if 0
+  EnActionType final_action = set_action;
+  switch (set_action) {
+  case EnActionType::DownPreparation:
+   [[fallthrough]];
+  case EnActionType::DownStart: {
+   if (EnActionType::DownBeworking == m_ActionTypePrev.load() || \
+    EnActionType::DownInPreparation == m_ActionTypePrev.load())
+    return;
+  }break;
+  case EnActionType::DownPause:
+   [[fallthrough]];
+  case EnActionType::DownStop: {
+   if (m_ActionTypePrev.load() == EnActionType::DownBeworking)
+    final_action = EnActionType::DownStoping;
+  }break;
+  default: {
+  }break;
+  }///switch
+#endif
+  m_ActionType.store(set_action);
+ }
+ bool TaskNode::IsPost() {
+  bool result = false;
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  if (m_ActionType == EnActionType::DownBeworking) {
+   result = true;
+  }
+  else if (m_ActionType == EnActionType::InstallBeworking) {
+   result = true;
+  }
+  else {
+   auto found = m_ActionPostedQ.find(m_ActionType);
+   if (found == m_ActionPostedQ.end()) {
+    m_ActionPostedQ.emplace(m_ActionType);
+    result = true;
+   }
+  }
+  return result;
+ }
+ bool TaskNode::Install() {
+  bool result = false;
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  do {
+   //!@ 创建安装进程
+   //! 
+   //! 
+   std::string process_pathname;
+   std::string commandline;
+   commandline
+    .append(componects_taskman::mapCommandLineIdentify.at(componects_taskman::EnCmdType::Verify))
+    .append("=").append(componects_taskman::STARUP_VERIFY)
+    .append(" ");
 
+   commandline
+    .append(componects_taskman::mapCommandLineIdentify.at(componects_taskman::EnCmdType::TaskId))
+    .append("=").append(std::to_string(m_ID))
+    .append(" ");
+
+#ifdef _DEBUG
+   process_pathname = R"(D:\__Github__\Windows\projects\pchacker\res\Taskman.exe)";
+#else
+   process_pathname = shared::Win::GetModulePathA(__gpHinstance) + "Taskman.exe";
+#endif
+
+   if (!shared::Win::AccessA(process_pathname))
+    break;
+
+#if 1 // 发行算法
+   if (Global::PCHackerGet()->m_TaskmanPtrQ.search(m_ID))
+    break;
+   shared::Win::Process::CreateA(
+    process_pathname,
+    commandline,
+    [&](const HANDLE&, const DWORD& create_pid) {
+     auto pTaskman = new Taskman(m_ID);
+     pTaskman->InPathname(m_DownCacheFilePathname);
+     pTaskman->OutPath(shared::Win::GetPathByPathnameA(m_FinishPathname) + std::to_string(m_ID) + "\\");
+     Global::PCHackerGet()->m_TaskmanPtrQ.push(m_ID, pTaskman);
+     result = true;
+    }, true, false, 0);
+#else //!@ 调试算法
+   auto pTaskman = new Taskman(m_ID);
+   pTaskman->InPathname(m_DownCacheFilePathname);
+   pTaskman->OutPath(shared::Win::GetPathByPathnameA(m_FinishPathname) + std::to_string(m_ID) + "\\");
+   Global::PCHackerGet()->m_TaskmanPtrQ.push(m_ID, pTaskman);
+#endif
+
+  } while (0);
+  return result;
+ }
  bool TaskNode::Perform() {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   do {
+   if (m_ActionType.load() == EnActionType::DownBeworking) {
+    result = true;
+    break;
+   }
+   m_ActionTypePrev.store(m_ActionType.load());
+   m_ActionType.store(EnActionType::DownBeworking);
    if (!m_pDownRequest)
     break;
    m_pDownRequest->Header(false);
+   m_pDownRequest->EnableWriteStream(false);
    m_pDownRequest->RequestType(libcurlpp::EnRequestType::REQUEST_TYPE_GET);
    m_pDownRequest->CachePathname(m_DownCacheFilePathname);
    m_pDownRequest->ProgressCb(
     [&](const libcurlpp::IProgressInfo* pDownProgressInfo, const libcurlpp::IProgressInfo*)->libcurlpp::ProgressActionType {
-     *m_pTaskResult << pDownProgressInfo;
-     return libcurlpp::ProgressActionType::Continue;
+     libcurlpp::ProgressActionType result = libcurlpp::ProgressActionType::Continue;
+     if (m_pTaskResult)
+      *m_pTaskResult << pDownProgressInfo;
+     if (m_ActionType.load() == EnActionType::DownStop) {
+      m_ActionTypePrev.store(m_ActionType.load());
+      m_ActionType.store(EnActionType::DownStopd);
+      result = libcurlpp::ProgressActionType::Break;
+     }
+     return result;
     });
    m_pDownRequest->FinishCb(
     [&](const libcurlpp::IResponse* resObj) {
-     *m_pTaskResult << resObj;
+     if (m_pTaskResult) {
+      *m_pTaskResult << resObj;
+     }
+     if (resObj->HttpCode() == 200) {
+      m_ActionTypePrev.store(m_ActionType.load());
+      m_ActionType.store(EnActionType::DownFinished);
+     }
+     else if (resObj->HttpCode() == 416) {
+      m_ActionTypePrev.store(m_ActionType.load());
+      m_ActionType.store(EnActionType::DownFinished);
+     }
+     else {
+      m_ActionTypePrev.store(m_ActionType.load());
+      m_ActionType.store(EnActionType::DownFailed);
+     }
     });
    m_pDownRequest->Action(libcurlpp::EnRequestAction::Start);
    result = true;
   } while (0);
+  if (!result) {
+   m_ActionTypePrev.store(m_ActionType.load());
+   m_ActionType.store(EnActionType::DownFailed);
+  }
   return result;
  }
  bool TaskNode::Preparation() {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_ActionTypePrev.store(m_ActionType.load());
+  m_ActionType.store(EnActionType::DownInPreparation);
   do {
    if (!m_pDownRequest || !m_pReadyRequest)
     break;
@@ -461,7 +494,12 @@ return result;
    //!@ 初始化下载缓冲文件路径名
    m_DownCacheFilePathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\caches\\" + std::to_string(m_ID) + file_format);
 
+   shared::Win::CreateDirectoryA(shared::Win::GetPathByPathnameA(m_LogoPathname));
+   shared::Win::CreateDirectoryA(shared::Win::GetPathByPathnameA(m_FinishPathname));
+   shared::Win::CreateDirectoryA(shared::Win::GetPathByPathnameA(m_DownCacheFilePathname));
+
    m_pReadyRequest->HeadersAdd(R"(content-type: application/x-www-form-urlencoded)");
+   m_pReadyRequest->EnableWriteStream(true);
    m_pReadyRequest->FinishCb(
     [&](const libcurlpp::IResponse* resObj) {
      do {
@@ -471,24 +509,35 @@ return result;
       if (body.empty())
        break;
       shared::Win::File::Write(m_LogoPathname, body);
-      m_pTaskResult->m_LogoPathname = m_LogoPathname;
      } while (0);
     });
    m_pHeadRequest->Header(true);
+   m_pHeadRequest->EnableWriteStream(true);
    m_pHeadRequest->RequestType(libcurlpp::EnRequestType::REQUEST_TYPE_HEAD);
    m_pHeadRequest->FinishCb(
     [&](const libcurlpp::IResponse* resObj) {
      do {
-      if (resObj->HttpCode() != 200)
+      if (resObj->HttpCode() != 200) {
+       m_ActionTypePrev.store(m_ActionType.load());
+       m_ActionType.store(EnActionType::DownFailed);
        break;
+      }
       m_ContentLength = resObj->ContentLength();
-      m_pTaskResult->m_ContentLength = m_ContentLength;
       result = true;
+      m_ActionTypePrev.store(m_ActionType.load());
+      m_ActionType.store(EnActionType::DownReady);
      } while (0);
     });
 
-   Global::HttpGet()->PerformM({ m_pReadyRequest,m_pHeadRequest });
+   Global::HttpGet()->Perform(m_pReadyRequest);
+   Global::HttpGet()->Perform(m_pHeadRequest);
+
+   //Global::HttpGet()->PerformM({ m_pReadyRequest,m_pHeadRequest });
   } while (0);
+  if (!result) {
+   m_ActionTypePrev.store(m_ActionType.load());
+   m_ActionType.store(EnActionType::DownFailed);
+  }
   return result;
  }
 
@@ -804,6 +853,145 @@ return result;
 
 
 
+
+#if 0
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+ void IDownTaskElement::SetDownDownTimeRemain(const size_t& size_remain,
+  const size_t& current_down_speed_value /*= NormalUserLimitDownSpeedValue*/, const DWORD& color /*= 0*/) {
+  do {
+   auto ui = GetSubCtrl<CLabelUI>(L"D1C4FD362124");
+   if (!ui)
+    break;
+   std::wstring time_text = L"--:--:--";
+   if (size_remain > 0 && current_down_speed_value > 0) {
+    time_t total_s = size_remain / current_down_speed_value;
+    time_text = shared::IConv::MBytesToWString(shared::Win::Time::TimePeriodUnMade(static_cast<UINT>(total_s)));
+   }
+   ui->SetText(time_text.c_str());
+   if (color)
+    ui->SetTextColor(color);
+  } while (0);
+ }
+ void IDownTaskElement::SetDownloadCompletionRate(const size_t& total, const size_t& current) {
+  std::wstring text = L"0.0%";
+  CLabelUI* ui_label = nullptr;
+  CProgressUI* ui_progress = nullptr;
+  do {
+   ui_progress = GetSubCtrl<CProgressUI>(L"90352B27A442");
+   ui_label = GetSubCtrl<CLabelUI>(L"56E157AE72A8");
+   if (!ui_progress || !ui_label)
+    break;
+   if (total <= 0 || current <= 0)
+    break;
+   const auto max = ui_progress->GetMaxValue();
+   double current_progress = (current * 1.0) / (total * 1.0);
+   int value = static_cast<int>(current_progress * max);
+   double RatioProgress = current_progress * max / 100.0;
+   text = std::format(L"{:.2f}%", RatioProgress);
+  } while (0);
+  if (ui_label)
+   ui_label->SetText(text.c_str());
+ }
+ void IDownTaskElement::StartingSwitch(const bool& status) {
+  do {
+   auto ui = GetSubCtrl<COptionUI>(L"06A057E7350B");
+   if (!ui)
+    break;
+   auto current_status = ui->IsSelected();
+   if (current_status == status)
+    break;
+   ui->Selected(status);
+  } while (0);
+ }
+ void IDownTaskElement::SetLogo(const std::wstring& logo_pathname) {
+  do {
+   if (!shared::Win::AccessW(logo_pathname))
+    break;
+   auto ui = GetSubCtrl<CLabelUI>(L"CCB822F77204");
+   if (!ui)
+    break;
+   ui->SetBkImage(logo_pathname.c_str());
+  } while (0);
+ }
+ void IDownTaskElement::SetDownSpeedValueVip(const size_t& real_speed/*-NormalUserLimitDownSpeedValue*/) {
+  do {
+   auto ui = GetSubCtrl<CLabelUI>(L"F5E1F8FAD133");
+   if (!ui)
+    break;
+   auto speed = shared::Win::RealtimeSpeed(real_speed);
+   ui->SetText(shared::IConv::MBytesToWString(speed).c_str());
+  } while (0);
+ }
+ void IDownTaskElement::SetDownSpeedValue(const size_t& value) {
+  do {
+   auto ui = GetSubCtrl<CLabelUI>(L"76E1ED97A767");
+   if (!ui)
+    break;
+   auto speed = shared::Win::RealtimeSpeed(value);
+   ui->SetText(shared::IConv::MBytesToWString(speed).c_str());
+  } while (0);
+ }
+ void IDownTaskElement::SetProgressValue(const size_t& total, const size_t& current) {
+  do {
+   if (total <= 0 || current <= 0)
+    break;
+   auto ui = GetSubCtrl<CProgressUI>(L"90352B27A442");
+   if (!ui)
+    break;
+   const auto max = ui->GetMaxValue();
+   double current_progress = (current * 1.0) / (total * 1.0);
+   int value = static_cast<int>(current_progress * max);
+   ui->SetValue(static_cast<int>(value));
+  } while (0);
+ }
+ void IDownTaskElement::SetName(const std::wstring& name, const DWORD& color) {
+  do {
+   auto ui = GetSubCtrl<CLabelUI>(L"DD0FB204BE1D");
+   if (!ui)
+    break;
+   ui->SetText(name.c_str());
+   if (color)
+    ui->SetTextColor(color);
+  } while (0);
+ }
+ void IDownTaskElement::StatusTextSet(const std::wstring& text, const DWORD& color) {
+  do {
+   auto ui = GetSubCtrl<CLabelUI>(L"E509EB1128BD");
+   if (!ui)
+    break;
+   ui->SetText(text.c_str());
+   if (color)
+    ui->SetTextColor(color);
+  } while (0);
+ }
+ void IDownTaskElement::ResourceSizeTextSet(const size_t& total, const size_t& current, const DWORD& color) {
+  do {
+   auto ui = GetSubCtrl<CLabelUI>(L"E4BD5BC33011");
+   if (!ui)
+    break;
+   if (total <= 0 && current <= 0) {
+    ui->SetText(L"--/--");
+    break;
+   }
+   auto realTotal = shared::Win::RealtimeSpeed(total);
+   auto realCurrent = shared::Win::RealtimeSpeed(current);
+   ui->SetText(std::format(L"{}/{}", shared::IConv::MBytesToWString(realCurrent), shared::IConv::MBytesToWString(realTotal)).c_str());
+   if (color)
+    ui->SetTextColor(color);
+  } while (0);
+ }
+ void IDownTaskElement::DownTotalTimeTextSet(const std::wstring& text, const DWORD& color) {
+  do {
+   auto ui = GetSubCtrl<CLabelUI>(L"D1C4FD362124");
+   if (!ui)
+    break;
+   ui->SetText(text.c_str());
+   if (color)
+    ui->SetTextColor(color);
+  } while (0);
+ }
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+#endif
 
 
 }///namespace lcoal

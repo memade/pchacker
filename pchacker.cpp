@@ -22,48 +22,95 @@ namespace local {
 
   shared::Win::CreateDirectoryA(m_SystemDirectoryA);
 
-  /*m_pSystemConfigure = new Configure(m_SystemDirectoryA + SystemConfigFilename);*/
+  Global::ServerGet()->SessionCreateAfterCb(
+   [this](libuvpp::ISession* pSession) {
+    pSession->Write(pchacker::TYPE_TASKMAN_MSG_WELCOME, "");
+   });
+  Global::ServerGet()->SessionDestoryBeforeCb(
+   [&](libuvpp::ISession* pSession) {
+    m_TaskmanPtrQ.pop(pSession->BindTaskId(),
+     [&](const auto&, auto& pTaskman) {
+      pTaskman->Release();
+     });
+   });
+  Global::ServerGet()->MessageCb(
+   [&](libuvpp::ISession* pSession, const std::string& message) {
+    auto pMsg = (shared::PPACKETHEAD)message.data();
+    if (pMsg->Verify()) {
+     auto pTaskMsg = reinterpret_cast<pchacker::PTASKMANMSG>(pMsg->data);
+     switch (pMsg->command) {
+     case pchacker::TYPE_TASKMAN_MSG_HELLO: {
+      pSession->BindTaskId(pTaskMsg->TaskId);
+      m_TaskmanPtrQ.search(pTaskMsg->TaskId,
+       [&](Taskman* pTaskman) {
+        pTaskMsg->ProcessId = ::GetCurrentProcessId();
+        ::memcpy(pTaskMsg->InPathname, pTaskman->InPathname().data(), pTaskman->InPathname().size());
+        ::memcpy(pTaskMsg->OutPath, pTaskman->OutPath().data(), pTaskman->OutPath().size());
+        pSession->Write(pchacker::TYPE_TASKMAN_MSG_EXTRACT, std::string((char*)pTaskMsg, pchacker::LENTASKMANMSG));
+       });
+     }break;
+     case pchacker::TYPE_TASKMAN_MSG_EXTRACT_NOTIFY: {
+#if 0
+      std::cout << std::format("install(total({}),current({}),progress({}))",
+       pTaskMsg->extract_total_size, pTaskMsg->extract_current_extract_total_size, pTaskMsg->extract_progress) << std::endl;
+#endif
 
-  do {//!@ 释放UI资源
-#ifdef _DEBUG
-   m_UISkinDirectory = LR"(D:\__SVN__\Memade\projects\pcdown\res\skin\)";
-   break;
-#endif // _DEBUG
+      m_TaskPool.search(pTaskMsg->TaskId,
+       [&](const auto&, pchacker::ITaskNode* pTask) {
+        pchacker::ExtractProgressInfo progress;
+        progress.extract_current = pTaskMsg->extract_current_extract_total_size;
+        progress.extract_percentage = pTaskMsg->extract_progress;
+        progress.extract_total = pTaskMsg->extract_total_size;
 
-   m_UISkinDirectory = shared::Win::PathFixedW(m_SystemDirectoryW + L"\\" + PathUISkin + L"\\");
-   shared::Win::CreateDirectoryW(m_UISkinDirectory);
-   /*if (!shared::Win::AccessW(m_UISkinDirectory)) */
-   {
-    std::string res = std::string((char*)&skin_zip_res[0], sizeof(skin_zip_res));
-    res = shared::Encryption::WemadeDecode(res);
-    if (!shared::Zip::IsZipCompress(res))
-     break;
-    if (!shared::Zip::zipBufferUnCompress(res,
-     [](const std::string&, const std::string&, bool&) {
-      return true;
-     },
-     shared::IConv::WStringToMBytes(m_UISkinDirectory)))
-     break;
-   }
-  } while (0);
+        *pTask << progress;
 
+        if (pTask->Status() != EnActionType::InstallBeworking)
+         pTask->Action(EnActionType::InstallBeworking);
+        m_ResponseResultQ.push(pTask);
+       });
 
-  auto discard = ::CoInitialize(NULL);
+     }break;
+     case pchacker::TYPE_TASKMAN_MSG_EXTRACT_SUCCESS: {
+
+      m_TaskPool.search(pTaskMsg->TaskId,
+       [&](const auto&, pchacker::ITaskNode* pTask) {
+        *pTask << pTaskMsg->Details;
+        pTask->Action(EnActionType::InstallFinish);
+        m_ResponseResultQ.push(pTask);
+       });
+      //shared::Win::Process::Terminate(pTaskMsg->ProcessId);
+     }break;
+     case pchacker::TYPE_TASKMAN_MSG_EXTRACT_FAILED: {
+      //shared::Win::Process::Terminate(pTaskMsg->ProcessId);
+      m_TaskPool.search(pTaskMsg->TaskId,
+       [&](const auto&, pchacker::ITaskNode* pTask) {
+        pTask->Action(EnActionType::InstallFailed);
+        m_ResponseResultQ.push(pTask);
+       });
+     }break;
+     default:
+      break;
+     }
+    }
+
+   });
+
+  Global::ServerGet()->Start(libuvpp::EnSocketType::TCP, libuvpp::EnIPV::IPV4, "127.0.0.1:13762");
+
   m_IsOpen.store(true);
   m_Threads.emplace_back([this]() {Process(); });
+  m_Threads.emplace_back([this]() {ResponseResult(); });
  }
  void PCHacker::UnInit() {
   for (auto& ui : m_UIMap) {
    ui.second->Destory();
    /*SK_DELETE_PTR(ui.second);*/
   }
+
   m_IsOpen.store(false);
   for (auto& t : m_Threads)
    t.join();
   m_Threads.clear();
-  ::CoUninitialize();
-
-
 
   //!@ 销毁项目日志记录仪
   shared::ISpdlog::DestoryInterface();
@@ -199,11 +246,11 @@ namespace local {
    SK_DELETE_PTR(*found);
    m_DownTaskNodeCaches.erase(found);
    result = true;
-  } while (0);
+ } while (0);
 #endif
-  return result;
- }
- bool PCHacker::TaskAction(const TypeID& resid, const DownActionType& action) {
+ return result;
+}
+ bool PCHacker::TaskAction(const TypeID& resid, const EnActionType& action) {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   result = m_TaskPool.search(resid,
@@ -414,4 +461,4 @@ namespace local {
 
 
 
-}///namespace lcoal
+ }///namespace lcoal

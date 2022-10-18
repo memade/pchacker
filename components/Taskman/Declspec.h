@@ -3,6 +3,8 @@
 
 namespace componects_taskman {
 
+ static const char STARUP_VERIFY[] = R"(3B0443FC_1E37_4CA9_9CA3_DBCA2A6D6AE0)";
+
  static const char LIB7Z_DEPENDENCY_IDENTIFY[] = R"(7z.dll)";
 
  static const char MODULE_NAME[] = R"(Taskman)";
@@ -15,21 +17,13 @@ namespace componects_taskman {
  };
 
  enum class EnCmdType {
-  HostPID = 0,
-  HostTID = 1,
-  OutPath = 2,
-  InPathname = 3,
-  HostPort = 4,
-  TaskType = 5,
+  Verify = 0,
+  TaskId = 1,
  };
 
  static const std::map<EnCmdType, std::string> mapCommandLineIdentify = {
-  {EnCmdType::HostPID,R"(--host-pid)"},
-  {EnCmdType::HostTID,R"(--host-tid)"},
-  {EnCmdType::OutPath,R"(--out-path)"},
-  {EnCmdType::InPathname,R"(--in-pathname)"},
-  {EnCmdType::HostPort,R"(--host-port)"},
-  {EnCmdType::HostPort,R"(--task-type)"},
+  {EnCmdType::Verify,R"(--verify)"},
+  {EnCmdType::TaskId,R"(--taskid)"},
  };
 
 }///componects_taskman

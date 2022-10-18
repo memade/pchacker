@@ -19,10 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core.h" />
     <ClInclude Include="Declspec.h" />
+    <ClInclude Include="Global.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core.cpp" />
+    <ClCompile Include="Global.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -85,27 +89,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\projects\$(solutionname)\res\</OutDir>
+    <OutDir>$(SolutionDir)..\..\projects\pchacker\res\</OutDir>
     <IntDir>$(SolutionDir)..\..\objs\$(Platform)\$(Configuration)\$(SolutionName)\$(ProjectName)\</IntDir>
-    <TargetName>$(ProjectName).$(Platform)</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\projects\$(solutionname)\res\</OutDir>
+    <OutDir>$(SolutionDir)..\..\projects\pchacker\res\</OutDir>
     <IntDir>$(SolutionDir)..\..\objs\$(Platform)\$(Configuration)\$(SolutionName)\$(ProjectName)\</IntDir>
-    <TargetName>$(ProjectName).$(Platform)</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\projects\$(solutionname)\res\</OutDir>
+    <OutDir>$(SolutionDir)..\..\projects\pchacker\res\</OutDir>
     <IntDir>$(SolutionDir)..\..\objs\$(Platform)\$(Configuration)\$(SolutionName)\$(ProjectName)\</IntDir>
-    <TargetName>$(ProjectName).$(Platform)</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\projects\$(solutionname)\res\</OutDir>
+    <OutDir>$(SolutionDir)..\..\projects\pchacker\res\</OutDir>
     <IntDir>$(SolutionDir)..\..\objs\$(Platform)\$(Configuration)\$(SolutionName)\$(ProjectName)\</IntDir>
-    <TargetName>$(ProjectName).$(Platform)</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -113,7 +117,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\projects\;$(SolutionDir)..\..\projects\pchacker\components\$(projectname)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\3rdparty\bit7z\include\;$(SolutionDir)..\..\projects\pchacker\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\projects\;$(SolutionDir)..\..\projects\pchacker\components\$(projectname)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\3rdparty\bit7z\include\;$(SolutionDir)..\..\projects\pchacker\;$(SolutionDir)..\..\3rdparty\spdlog\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -143,7 +147,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\projects\;$(SolutionDir)..\..\projects\pchacker\components\$(projectname)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\3rdparty\bit7z\include\;$(SolutionDir)..\..\projects\pchacker\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\projects\;$(SolutionDir)..\..\projects\pchacker\components\$(projectname)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\3rdparty\bit7z\include\;$(SolutionDir)..\..\projects\pchacker\;$(SolutionDir)..\..\3rdparty\spdlog\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
@@ -175,7 +179,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\projects\;$(SolutionDir)..\..\projects\pchacker\components\$(projectname)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\3rdparty\bit7z\include\;$(SolutionDir)..\..\projects\pchacker\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\projects\;$(SolutionDir)..\..\projects\pchacker\components\$(projectname)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\3rdparty\bit7z\include\;$(SolutionDir)..\..\projects\pchacker\;$(SolutionDir)..\..\3rdparty\spdlog\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
@@ -203,7 +207,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\projects\;$(SolutionDir)..\..\projects\pchacker\components\$(projectname)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\3rdparty\bit7z\include\;$(SolutionDir)..\..\projects\pchacker\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\projects\;$(SolutionDir)..\..\projects\pchacker\components\$(projectname)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\3rdparty\bit7z\include\;$(SolutionDir)..\..\projects\pchacker\;$(SolutionDir)..\..\3rdparty\spdlog\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>

@@ -14,11 +14,15 @@ namespace local {
 	public:
 		static PCHacker* PCHackerGet();
 		static libcurlpp::IHttpApi* HttpGet();
+		static libuvpp::ILibuv* LibuvGet();
+		static libuvpp::IServer* ServerGet();
 	private:
 		PCHacker* m_pPCHacker = nullptr;
 		libcurlpp::IHttpApi* m_pHttpObj = nullptr;
 		std::atomic_bool m_Ready = false;
-
+		libuvpp::ILibuv* m_pLibuv = nullptr;
+		libuvpp::IServer* m_pServer = nullptr;
+		//Server* m_pServer = nullptr;
 #if ENABLE_MODULE_CEF3
 	public:
 		static shared::cef3::ICef3Api* Cef3Get();

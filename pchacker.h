@@ -21,7 +21,7 @@ namespace local {
   void UIPositionSet(const UIType&, const ::tagPOINT&, const ::tagSIZE&) override final;
   HWND UICreate(const UIType&, const bool& show) override final;
   IDownTaskNode* TaskCreate(const TypeID&) override final;
-  bool TaskAction(const TypeID&, const DownActionType&) override final;
+  bool TaskAction(const TypeID&, const EnActionType&) override final;
   bool TaskDestory(IDownTaskNode*) override final;
   bool TaskPerform(IDownTaskNode*) override final;
   const std::wstring& SystemDirectoryW() const override final;
@@ -39,16 +39,21 @@ namespace local {
   const std::wstring& UISkinDirectory() const;
  private:
   void Process();
+  void ResponseResult();
  private:
   std::vector<std::thread> m_Threads;
   std::atomic_bool m_IsOpen = false;
   std::map<UIType, UIBase*> m_UIMap;
-  shared::container::map<TypeID/*res(game) id*/, TaskNode*> m_TaskPool;
   std::wstring m_CurrentUserDirectoryW;
   std::string m_CurrentUserDirectoryA;
   std::wstring m_SystemDirectoryW;
   std::string m_SystemDirectoryA;
   std::wstring m_UISkinDirectory;
+  shared::container::map<TypeID/*res(game) id*/, TaskNode*> m_TaskPool;
+  shared::container::queue<std::shared_ptr<ITaskResultStatus>> m_ResultQ;
+  shared::container::queue<ITaskNode*> m_ResponseResultQ;
+ public:
+  shared::container::map<TypeID, Taskman*> m_TaskmanPtrQ;
  protected:
   bool Bit7zArchiveProcess() override final;
   bool ZipArchiveProcess() override final;
