@@ -17,20 +17,9 @@ namespace local {
   do {
    if (m_Ready.load())
     break;
-#if ENABLE_MODULE_CEF3
-   m_pCef3Obj = shared::cef3::ICef3Api::CreateInterface((shared::Win::GetModulePathA(__gpHinstance) + "cef3.dll").c_str());
-   if (!m_pCef3Obj)
-    break;
-#endif
-   m_pLibuv = libuvpp::ILibuv::CreateInterface((shared::Win::GetModulePathA(__gpHinstance) + "libuvpp.dll").c_str());
-   if (!m_pLibuv)
-    break;
+   m_pLibuv = new libuvpp::Libuv();
    m_pServer = m_pLibuv->CreateServer();
-   if (!m_pServer)
-    break;
-   m_pHttpObj = libcurlpp::IHttpApi::CreateInterface((shared::Win::GetModulePathA(__gpHinstance) + "libcurlpp.dll").c_str());
-   if (!m_pHttpObj)
-    break;
+   m_pHttpObj = new libcurlpp::Http();
    m_pPCHacker = new PCHacker();
    m_Ready.store(true);
   } while (0);
@@ -38,14 +27,9 @@ namespace local {
  }
 
  void Global::UnInit() {
-  if (m_pServer)
-   m_pServer->Stop();
+  m_pLibuv->Release();
+  m_pHttpObj->Release();
   SK_DELETE_PTR(m_pPCHacker);
-  libcurlpp::IHttpApi::DestoryInterface(m_pHttpObj);
-  libuvpp::ILibuv::DestoryInterface(m_pLibuv);
-#if ENABLE_MODULE_CEF3
-  shared::cef3::ICef3Api::DestoryInterface(m_pCef3Obj);
-#endif
 }
 
 
@@ -67,17 +51,6 @@ namespace local {
   } while (0);
   return result;
  }
-#if ENABLE_MODULE_CEF3
- shared::cef3::ICef3Api* Global::Cef3Get() {
-  shared::cef3::ICef3Api* result = nullptr;
-  do {
-   if (!__gpGlobal)
-    break;
-   result = __gpGlobal->m_pCef3Obj;
-  } while (0);
-  return result;
- }
-#endif
  libuvpp::IServer* Global::ServerGet() {
   libuvpp::IServer* result = nullptr;
   do {

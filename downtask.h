@@ -12,8 +12,6 @@ namespace local {
   void* m_BindUI = nullptr;
   void* m_BindUI2 = nullptr;
   void* m_BindPtr = nullptr;
-  std::string m_DownPath;
-  std::string m_DownPathname;
   std::string m_OpenCommandLine;
   std::string m_LocalResDir;
   std::string m_Name;
@@ -26,6 +24,7 @@ namespace local {
   unsigned int m_VipLevel = 0;
   std::string m_Url;
   std::string m_LogoPathname;
+  std::string m_FinishPath;
   std::string m_FinishPathname;
   std::string m_DownCacheFilePathname;
   size_t m_ContentLength = 0;
@@ -73,16 +72,17 @@ namespace local {
   std::string m_FinishPath;
   std::string m_FinishPathname;
  private:
-  void operator<<(const libcurlpp::IProgressInfo*);
-  void operator<<(const libcurlpp::IResponse*);
+  void operator<<(const pchacker::libcurlpp::IProgressInfo*);
+  void operator<<(const pchacker::libcurlpp::IResponse*);
  };
  class TaskNode final : public ITaskNode, public ITaskCommonData {
   std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
  public:
   TaskNode(const TypeID&);
-  TaskNode(const TypeID&, const std::string& json_data);
+ protected:
   virtual ~TaskNode();
  public:
+  void Release() const override final;
   const TypeID& ID() const override final;
   void Url(const std::string&) override final;
   const std::string& Url() const override final;
@@ -99,10 +99,13 @@ namespace local {
   const std::string& LocalResDir() const override final;
   void Name(const std::string&) override final;
   const std::string& Name() const override final;
-  void DownPath(const std::string&) override final;
-  void DownPathname(const std::string&) override final;
+  void DownCacheFilePathname(const std::string&) override final;
+  const std::string& DownCacheFilePathname() const override final;
+  void FinishPath(const std::string&) override final;
+  const std::string& FinishPath() const override final;
+  void FinishPathname(const std::string&) override final;
+  const std::string& FinishPathname() const override final;
   void OpenCommandLine(const std::string&) override final;
-  bool operator<<(const DockingData&) override final;
   void operator<<(const EXTRACTPROGRESSINFO&) override final;
   void operator<<(const tagTaskmanMsg::tagDetails&) override final;
   void RoutePtr(void*) override final;
@@ -115,10 +118,9 @@ namespace local {
   void* BindPtr() const override final;
   void DownLimitSpeed(const long long&/*b*/) override final;
   ITaskResultStatus* Result() const  override final;
-  void Release() const override final;
-  bool Preparation() override final;
   bool Perform() override final;
   bool Install() override final;
+  bool FinalResult() const override final;
  public:
   EnActionType Action() const;
   EnActionType ActionPrev() const;
@@ -126,12 +128,11 @@ namespace local {
   void TaskType(const EnTaskType&);
   bool IsPost();
  protected:
-  libcurlpp::IRequest* m_pHeadRequest = nullptr;
-  libcurlpp::IRequest* m_pDownRequest = nullptr;
-  libcurlpp::IRequest* m_pReadyRequest = nullptr;
+  pchacker::TypeIdentify m_DownRequestIdentify = 0;
   TaskResult* m_pTaskResult = nullptr;
  private:
   std::set<EnActionType> m_ActionPostedQ;
+  std::atomic_bool m_FinalResult = false;
 
 #if 0
  public:
@@ -176,7 +177,7 @@ namespace local {
   void SetDownSpeedValueVip(const size_t& real_speed/*-200kb*/);
   void SetDownDownTimeRemain(const size_t& size_remain, const size_t& current_down_speed_value = NormalUserLimitDownSpeedValue, const DWORD& color = 0);
   void StartingSwitch(const bool&);
-};
+ };
 #endif
 }///namespace local 
 

@@ -2,278 +2,121 @@
 
 namespace local {
 
- Configure::Configure(const std::string& config_file) : m_ConfigureFilePathname(config_file) {
+ Configure::Configure() {
   Init();
  }
 
  Configure::~Configure() {
   UnInit();
  }
- void Configure::Finish() {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-
-
-
-#if 0
-  if (!m_ConfigureDataCache.empty())
-   shared::Win::File::Write(m_ConfigureFilePathname, m_ConfigureDataCache);
-#endif
- }
- void Configure::operator>>(std::string& output) const {
-#if 0
-  output.clear();
-  do {
-   rapidjson::Document doc{ rapidjson::Type::kObjectType };
-   doc.AddMember(
-    rapidjson::Value().SetString("StartupPowerOn", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetBool(m_StartupPowerOn).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("AutoInstalledAfterDownload", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetBool(m_AutoInstalledAfterDownload).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("HideAdsAfterOpened", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetBool(m_HideAdsAfterOpened).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("OnCloseBtnToExit", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetBool(m_OnCloseBtnToExit).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("OnCloseBtnToTaskbar", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetBool(m_OnCloseBtnToTaskbar).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("ShutdownAfterDownload", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetBool(m_ShutdownAfterDownload).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("DownloadSpeedLimit", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetBool(m_DownloadSpeedLimit).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("DownloadSpeedThresholdValue", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetUint(m_DownloadSpeedThresholdValue).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("DownloadConfigKeepDays", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetUint(m_DownloadConfigKeepDays).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("InstallpakSavePath", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetString(m_InstallpakSavePath.c_str(), doc.GetAllocator()).Move(),
-    doc.GetAllocator());
-   doc.AddMember(
-    rapidjson::Value().SetString("InstallBasePath", doc.GetAllocator()).Move(),
-    rapidjson::Value().SetString(m_InstallBasePath.c_str(), doc.GetAllocator()).Move(),
-    doc.GetAllocator());
-   output = shared::Json::toString(doc);
-  } while (0);
-#endif
- }
-
- bool Configure::operator<<(const std::string& input) {
-  bool result = false;
-  do {
-   if (input.empty())
-    break;
-#if 0
-   rapidjson::Document doc;
-   if (doc.Parse(input.data(), input.size()).HasParseError())
-    break;
-   if (doc.HasMember("StartupPowerOn") && doc["StartupPowerOn"].IsBool())
-    m_StartupPowerOn = doc["StartupPowerOn"].GetBool();
-   if (doc.HasMember("AutoInstalledAfterDownload") && doc["AutoInstalledAfterDownload"].IsBool())
-    m_AutoInstalledAfterDownload = doc["AutoInstalledAfterDownload"].GetBool();
-   if (doc.HasMember("HideAdsAfterOpened") && doc["HideAdsAfterOpened"].IsBool())
-    m_HideAdsAfterOpened = doc["HideAdsAfterOpened"].GetBool();
-   if (doc.HasMember("OnCloseBtnToExit") && doc["OnCloseBtnToExit"].IsBool())
-    m_OnCloseBtnToExit = doc["OnCloseBtnToExit"].GetBool();
-   if (doc.HasMember("m_OnCloseBtnToTaskbar") && doc["OnCloseBtnToTaskbar"].IsBool())
-    m_OnCloseBtnToTaskbar = doc["OnCloseBtnToTaskbar"].GetBool();
-   if (doc.HasMember("InstallpakSavePath") && doc["InstallpakSavePath"].IsString())
-    m_InstallpakSavePath = doc["InstallpakSavePath"].GetString();
-   if (doc.HasMember("InstallBasePath") && doc["InstallBasePath"].IsString())
-    m_InstallBasePath = doc["InstallBasePath"].GetString();
-   if (doc.HasMember("ShutdownAfterDownload") && doc["ShutdownAfterDownload"].IsBool())
-    m_ShutdownAfterDownload = doc["ShutdownAfterDownload"].GetBool();
-   if (doc.HasMember("DownloadSpeedLimit") && doc["DownloadSpeedLimit"].IsBool())
-    m_DownloadSpeedLimit = doc["DownloadSpeedLimit"].GetBool();
-   if (doc.HasMember("DownloadSpeedThresholdValue") && doc["DownloadSpeedThresholdValue"].IsNumber())
-    m_DownloadSpeedThresholdValue = doc["DownloadSpeedThresholdValue"].GetUint();
-   if (doc.HasMember("DownloadConfigKeepDays") && doc["DownloadConfigKeepDays"].IsNumber())
-    m_DownloadConfigKeepDays = doc["DownloadConfigKeepDays"].GetUint();
-#endif
-   result = true;
-  } while (0);
-  return result;
- }
  void Configure::Init() {
-  bool file_init_flag = false;
+  m_DefaultDownloadCacheFileFormat = R"(.defaultdownloadcachefileformat)";
+  m_LocalServiceTcpAddr = R"(127.0.0.1:13762)";
+  const std::string project_current_path = shared::Win::GetModulePathA(__gpHinstance);
+  m_ProjectLoggerRecorderModuleName = shared::Win::GetModuleNameA(true, __gpHinstance);
+  m_ProjectLoggerRecorderPath = shared::Win::PathFixedA(project_current_path + R"(/logs/)");
+  m_DownResourceCachePath = shared::Win::PathFixedA(project_current_path + R"(/caches/)");
+  m_FinishInstalledPath = shared::Win::PathFixedA(project_current_path + R"(/finishs/)");
+  m_DownPreparedResourcePath = shared::Win::PathFixedA(project_current_path + R"(/prepareds/)");
 
-  m_PathForStoringTheInstallationPackage = Global::PCHackerGet()->SystemDirectoryA();
-
-  m_ProgramInstallationPath = Global::PCHackerGet()->SystemDirectoryA();
-#if 0
-  m_InstallpakSavePath = "c:\\games\\";
-  m_InstallBasePath = "c:\\games\\";
-
-  do {
-   if (m_ConfigureFilePathname.empty())
-    break;
-   if (!shared::Win::AccessA(m_ConfigureFilePathname)) {
-    reset_config = true;
-    break;
-   }
-   m_ConfigureDataCache = shared::Win::File::Read(m_ConfigureFilePathname);
-   if (!(*this << m_ConfigureDataCache)) {
-    reset_config = true;
-    break;
-   }
-
-  } while (0);
-
-  do {
-   if (!reset_config)
-    break;
-   *this >> m_ConfigureDataCache;
-   Finish();
-  } while (0);
-
-  do {
-
-  } while (0);
-#endif
+  shared::Win::CreateDirectoryA(project_current_path);
+  shared::Win::CreateDirectoryA(m_ProjectLoggerRecorderPath);
+  shared::Win::CreateDirectoryA(m_DownResourceCachePath);
+  shared::Win::CreateDirectoryA(m_FinishInstalledPath);
+  shared::Win::CreateDirectoryA(m_DownPreparedResourcePath);
  }
  void Configure::UnInit() {
 
  }
+ void Configure::operator<<(const Configure* pConfigure) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  do {
+   if (!pConfigure)
+    break;
+   m_LocalServiceTcpAddr = pConfigure->m_LocalServiceTcpAddr;
+   m_ProjectLoggerRecorderModuleName = pConfigure->m_ProjectLoggerRecorderModuleName;
+   m_ProjectLoggerRecorderPath = shared::Win::PathFixedA(pConfigure->m_ProjectLoggerRecorderPath);
+   m_DownResourceCachePath = shared::Win::PathFixedA(pConfigure->m_DownResourceCachePath);
+   m_FinishInstalledPath = shared::Win::PathFixedA(pConfigure->m_FinishInstalledPath);
+   m_DownPreparedResourcePath = shared::Win::PathFixedA(pConfigure->m_DownPreparedResourcePath);
+  } while (0);
+ }
+ bool Configure::DownResourceCachePath(const std::string& path) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_DownResourceCachePath = path;
+  return shared::Win::CreateDirectoryA(m_DownResourceCachePath);
+ }
+ const std::string& Configure::DownResourceCachePath() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_DownResourceCachePath;
+ }
+ bool Configure::FinishInstalledPath(const std::string& path) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_FinishInstalledPath = path;
+  return shared::Win::CreateDirectoryA(m_FinishInstalledPath);
+ }
+ const std::string& Configure::FinishInstalledPath() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_FinishInstalledPath;
+ }
+ bool Configure::DownPreparedResourcePath(const std::string& path) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_DownPreparedResourcePath = path;
+  return shared::Win::CreateDirectoryA(m_DownPreparedResourcePath);
+ }
+ const std::string& Configure::DownPreparedResourcePath() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_DownPreparedResourcePath;
+ }
+ bool Configure::ProjectLoggerRecorderPath(const std::string& path) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_ProjectLoggerRecorderPath = path;
+  return shared::Win::CreateDirectoryA(m_ProjectLoggerRecorderPath);
+ }
+ const std::string& Configure::ProjectLoggerRecorderPath() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_ProjectLoggerRecorderPath;
+ }
+ bool Configure::ProjectLoggerRecorderModuleName(const std::string& name) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_ProjectLoggerRecorderModuleName = name;
+  return shared::Win::CreateDirectoryA(m_ProjectLoggerRecorderModuleName);
+ }
+ const std::string& Configure::ProjectLoggerRecorderModuleName() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_ProjectLoggerRecorderModuleName;
+ }
+ void Configure::LocalServiceTcpAddr(const std::string& addr) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_LocalServiceTcpAddr = addr;
+ }
+ const std::string& Configure::LocalServiceTcpAddr() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_LocalServiceTcpAddr;
+ }
+ void Configure::DefaultDownloadCacheFileFormat(const std::string& format) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_DefaultDownloadCacheFileFormat = format;
+ }
+ const std::string& Configure::DefaultDownloadCacheFileFormat() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_DefaultDownloadCacheFileFormat;
+ }
+ void Configure::EnableLibuvpp(const bool& enable) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_EnableLibuvpp = enable;
+ }
+ const bool& Configure::EnableLibuvpp() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_EnableLibuvpp;
+ }
+ void Configure::EnableLibcurlpp(const bool& enable) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_EnableLibcurlpp = enable;
+ }
+ const bool& Configure::EnableLibcurlpp() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_EnableLibcurlpp;
+ }
 
-
-
- bool Configure::StartsAutomaticallyWhenStarts() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_StartsAutomaticallyWhenStarts;
- }
- bool Configure::LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup;
- }
- bool Configure::AutomaticallyInstalledAfterDownloading() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_AutomaticallyInstalledAfterDownloading;
- }
- bool Configure::NoPromotionalAdsAreDisplayedWhenOpened() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_NoPromotionalAdsAreDisplayedWhenOpened;
- }
- bool Configure::NoMoreRemindersEverytimeItClosesInClickCloseBtn() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_NoMoreRemindersEverytimeItClosesInClickCloseBtn;
- }
- bool Configure::MinimizeToSystemTrayInClickCloseBtn() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_MinimizeToSystemTrayInClickCloseBtn;
- }
- bool Configure::ExitImmediatelyInClickCloseBtn() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_ExitImmediatelyInClickCloseBtn;
- }
- const std::string& Configure::PathForStoringTheInstallationPackage() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_PathForStoringTheInstallationPackage;
- }
- const std::string& Configure::ProgramInstallationPath() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_ProgramInstallationPath;
- }
- bool Configure::NolimitOnDownloadSpeed() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_NolimitOnDownloadSpeed;
- }
- const unsigned int& Configure::DownloadSpeedThreshold() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_DownloadSpeedThreshold;
- }
- bool Configure::InstallationPackageAutomaticallyDownloadedToDefaultPath() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_InstallationPackageAutomaticallyDownloadedToDefaultPath;
- }
- const unsigned int& Configure::TheInstallationPackageIsReservedDays() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_TheInstallationPackageIsReservedDays;
- }
- bool Configure::ShutDownAfterDownloading() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_ShutDownAfterDownloading;
- }
- const unsigned int& Configure::DisableDelayInMinutes() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_DisableDelayInMinutes;
- }
-
-
- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
- bool PCHacker::StartsAutomaticallyWhenStarts() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_StartsAutomaticallyWhenStarts;
- }
- bool PCHacker::LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup;
- }
- bool PCHacker::AutomaticallyInstalledAfterDownloading() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_AutomaticallyInstalledAfterDownloading;
- }
- bool PCHacker::NoPromotionalAdsAreDisplayedWhenOpened() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_NoPromotionalAdsAreDisplayedWhenOpened;
- }
- bool PCHacker::NoMoreRemindersEverytimeItClosesInClickCloseBtn() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_NoMoreRemindersEverytimeItClosesInClickCloseBtn;
- }
- bool PCHacker::MinimizeToSystemTrayInClickCloseBtn() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_MinimizeToSystemTrayInClickCloseBtn;
- }
- bool PCHacker::ExitImmediatelyInClickCloseBtn() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_ExitImmediatelyInClickCloseBtn;
- }
- const std::string& PCHacker::PathForStoringTheInstallationPackage() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_PathForStoringTheInstallationPackage;
- }
- const std::string& PCHacker::ProgramInstallationPath() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_ProgramInstallationPath;
- }
- bool PCHacker::NolimitOnDownloadSpeed() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_NolimitOnDownloadSpeed;
- }
- const unsigned int& PCHacker::DownloadSpeedThreshold() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_DownloadSpeedThreshold;
- }
- bool PCHacker::InstallationPackageAutomaticallyDownloadedToDefaultPath() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_InstallationPackageAutomaticallyDownloadedToDefaultPath;
- }
- const unsigned int& PCHacker::TheInstallationPackageIsReservedDays() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_TheInstallationPackageIsReservedDays;
- }
- bool PCHacker::ShutDownAfterDownloading() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_ShutDownAfterDownloading;
- }
- const unsigned int& PCHacker::DisableDelayInMinutes() const {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_DisableDelayInMinutes;
- }
 }///namespace lcoal

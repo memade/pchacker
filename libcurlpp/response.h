@@ -1,0 +1,100 @@
+﻿#if !defined(INC_H___3D9AAFA7_34E9_4421_A70F_1D8E4230A42B__HEAD__)
+#define INC_H___3D9AAFA7_34E9_4421_A70F_1D8E4230A42B__HEAD__
+
+namespace pchacker {
+ namespace libcurlpp {
+  class ProgressInfo;
+  class Response final : public IResponse {
+   friend class Request;
+   std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
+  public:
+   Response(const TypeIdentify& identify);
+   virtual ~Response();
+  protected:
+   const TypeIdentify& Identify() const override final;
+   const std::string& OriginalRequestUrl() const override final;
+   void* RoutePtr() const override final;
+   const std::string& WhatRequest() const override final;
+   const std::string& WhatResponse() const override final;
+   const std::string& CachePathname() const override final;
+   const unsigned int& CurlCode() const override final;
+   const unsigned int& CurlMsg() const override final;
+   const std::string& ExceptionReason() const override final;
+   const long& HttpCode() const override final;
+   const std::string& Body() const override final;
+   const TypeHeaders& ResponseHeaders() const override final;
+   const size_t& ContentLength() const override final;
+   bool ResultFinal() const override final;
+  private:
+   const TypeIdentify m_Identify;
+   TypeHeaders m_ResponseHeaders;
+   std::string m_OriginalRequestUrl;
+   void* m_RoutePtr = nullptr;
+   std::string m_CachePathname;
+   FileCache* m_pFileCache = nullptr;
+   unsigned int m_CurlCode = -1;
+   unsigned int m_CurlMsg = -1;
+   std::string m_ExceptionReason;
+   std::string m_WriteStream;
+   size_t m_ContentLength = 0;
+   std::string m_WhatResponse;
+   std::string m_WhatRequest;
+   long long m_TargetTotalSize = 0;
+  private:
+   TypeHeaders m_RequestHeadersCache;
+   std::atomic_llong m_LastDownSize = 0;
+   std::atomic_llong m_LastDownTimestampMS = 0;
+   std::atomic_llong m_LastUploadSize = 0;
+   std::atomic_llong m_LastUploadTimestampMS = 0;
+   std::atomic_llong m_ResumeFromLarge = 0;
+   std::atomic_llong m_MaxRecvSpeedLarge = 0;
+   std::atomic<EnRequestAction> m_Action = EnRequestAction::Normal;
+   std::atomic<EnRequestType> m_RequestType = EnRequestType::REQUEST_TYPE_GET;
+   std::atomic<EnResumeFromLargeMode> m_ResumeFromLargeMode = EnResumeFromLargeMode::Addup;
+  public:
+   std::shared_ptr<ProgressInfo> DownProgressInfoGet() const;
+  private:
+   void operator<<(const Request*);
+   void operator<<(const tagProgress&);
+   ProgressInfo* m_pProgressInfoUpload = nullptr;
+   ProgressInfo* m_pProgressInfoDownload = nullptr;
+
+   std::uint64_t m_TimeoutResponseMS = 0;
+   std::string m_EffectiveUrl;
+   long m_ResponseCode = 0;
+   long m_HttpConnectCode = 0;
+   long m_FileTime = 0;
+   double m_TotalTime = 0;
+   double m_NameLookupTime = 0;
+   double m_ConnectTime = 0;
+   double m_PreTransferTime = 0;
+   double m_StartTransferTime = 0;
+   double m_RedirectTime = 0;
+   long m_RedirectCount = 0;
+   double m_SizeUpload = 0;
+   double m_SizeDownload = 0;
+   double m_SpeedDownload = 0;
+   double m_SpeedUpload = 0;
+   long m_HeaderSize = 0;
+   long m_RequestSize = 0;
+   long m_SslVerifyResult = 0;
+   std::list<std::string> m_SslEngines;
+   double m_ContentLengthDownload = 0;
+   double m_ContentLengthUpload = 0;
+   std::string m_ContentType;
+   long m_HttpAuthAvail = 0;
+   long m_ProxyAuthAvail = 0;
+   long m_OsErrno = 0;
+   long m_NumConnects = 0;
+   std::list<std::string> m_CookieList;
+  };
+
+
+ }///namespace libcurlpp
+}
+
+/// /*新生®（上海）**/
+/// /*2022_09_08T11:12:47.8151364Z**/
+/// /*_ _ _ _ _ _ _ www.skstu.com _ _ _ _ _ _ _**/
+#endif ///INC_H___3D9AAFA7_34E9_4421_A70F_1D8E4230A42B__HEAD__
+

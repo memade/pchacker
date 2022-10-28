@@ -6,64 +6,42 @@ namespace local {
  class Configure final : public IConfigure {
   std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
  public:
-  Configure(const std::string& configure_file);
+  Configure();
   virtual ~Configure();
  private:
   void Init();
   void UnInit();
-  void operator>>(std::string&) const;
-  bool operator<<(const std::string&);
  public:
-  bool StartsAutomaticallyWhenStarts() const override final;
-  bool LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup() const override final;
-  bool AutomaticallyInstalledAfterDownloading() const override final;
-  bool NoPromotionalAdsAreDisplayedWhenOpened() const override final;
-  bool NoMoreRemindersEverytimeItClosesInClickCloseBtn() const override final;
-  bool MinimizeToSystemTrayInClickCloseBtn() const override final;
-  bool ExitImmediatelyInClickCloseBtn() const override final;
-  const std::string& PathForStoringTheInstallationPackage() const override final;
-  const std::string& ProgramInstallationPath() const override final;
-  bool NolimitOnDownloadSpeed() const override final;
-  const unsigned int& DownloadSpeedThreshold() const override final;
-  bool InstallationPackageAutomaticallyDownloadedToDefaultPath() const override final;
-  const unsigned int& TheInstallationPackageIsReservedDays() const override final;
-  bool ShutDownAfterDownloading() const override final;
-  const unsigned int& DisableDelayInMinutes() const override final;
+  bool DownResourceCachePath(const std::string&) override final;
+  const std::string& DownResourceCachePath() const override final;
+  bool FinishInstalledPath(const std::string&) override final;
+  const std::string& FinishInstalledPath() const override final;
+  bool DownPreparedResourcePath(const std::string&) override final;
+  const std::string& DownPreparedResourcePath() const override final;
+  bool ProjectLoggerRecorderPath(const std::string&) override final;
+  const std::string& ProjectLoggerRecorderPath() const override final;
+  bool ProjectLoggerRecorderModuleName(const std::string&) override final;
+  const std::string& ProjectLoggerRecorderModuleName() const override final;
+  void LocalServiceTcpAddr(const std::string&) override final;
+  const std::string& LocalServiceTcpAddr() const override final;
+  void DefaultDownloadCacheFileFormat(const std::string&) override final;
+  const std::string& DefaultDownloadCacheFileFormat() const override final;
+  void EnableLibuvpp(const bool&) override final;
+  const bool& EnableLibuvpp() const override final;
+  void EnableLibcurlpp(const bool&) override final;
+  const bool& EnableLibcurlpp() const override final;
  public:
-  void Finish();
+  void operator<<(const Configure*);
  private:
-  /// 安装包存储路径
-  std::string m_PathForStoringTheInstallationPackage;
-  /// 安装路径
-  std::string m_ProgramInstallationPath;
-  /// 配置映射文件路径名
-  const std::string m_ConfigureFilePathname;
-  /// 开机自动启动
-  bool m_StartsAutomaticallyWhenStarts = false;
-  /// 启动时自动下载上次未完成的下载
-  bool m_LastIncompleteDownloadIsDownloadedAutomaticallyAtStartup = false;
-  /// 下载完成后自动安装游戏
-  bool m_AutomaticallyInstalledAfterDownloading = false;
-  /// 打开后不显示推广广告
-  bool m_NoPromotionalAdsAreDisplayedWhenOpened = false;
-  /// 每次关闭时不再提醒我
-  bool m_NoMoreRemindersEverytimeItClosesInClickCloseBtn = false;
-  /// 最小化到系统托盘区
-  bool m_MinimizeToSystemTrayInClickCloseBtn = false;
-  /// 立即退出
-  bool m_ExitImmediatelyInClickCloseBtn = false;
-  /// 不限制下载速度
-  bool m_NolimitOnDownloadSpeed = false;
-  /// 下载速度阀值
-  unsigned int m_DownloadSpeedThreshold = 4096 * 1024;
-  /// 自动下载安装包至默认路径
-  bool m_InstallationPackageAutomaticallyDownloadedToDefaultPath = false;
-  /// 安装包保留天数
-  unsigned int m_TheInstallationPackageIsReservedDays = 0;
-  /// 下载完成后关机
-  bool m_ShutDownAfterDownloading = false;
-  /// 关闭延迟分钟数
-  unsigned int m_DisableDelayInMinutes = 240;
+  bool m_EnableLibcurlpp = false;
+  bool m_EnableLibuvpp = false;
+  std::string m_FinishInstalledPath;
+  std::string m_DownResourceCachePath;
+  std::string m_DownPreparedResourcePath;
+  std::string m_ProjectLoggerRecorderPath;
+  std::string m_ProjectLoggerRecorderModuleName;
+  std::string m_LocalServiceTcpAddr;
+  std::string m_DefaultDownloadCacheFileFormat;
  };
 
 }///namespace local 

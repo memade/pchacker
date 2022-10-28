@@ -3,69 +3,16 @@
 namespace local {
  TaskNode::TaskNode(const TypeID& task_id) :
   ITaskCommonData(task_id),
-  m_pTaskResult(new TaskResult()),
-  m_pHeadRequest(Global::HttpGet()->CreateRequest()),
-  m_pReadyRequest(Global::HttpGet()->CreateRequest()),
-  m_pDownRequest(Global::HttpGet()->CreateRequest())
+  m_pTaskResult(new TaskResult())
  {
-
- }
- TaskNode::TaskNode(const TypeID& task_id, const std::string& gbk_json_data) :
-  ITaskCommonData(task_id),
-  m_pTaskResult(new TaskResult()),
-  m_pHeadRequest(Global::HttpGet()->CreateRequest()),
-  m_pReadyRequest(Global::HttpGet()->CreateRequest()),
-  m_pDownRequest(Global::HttpGet()->CreateRequest())
- {
-  do {
-   if (gbk_json_data.empty())
-    break;
-#if 0
-   {
-    "module":"runGame",
-     "vip" : 1,
-     "gameId" : 3,
-     "gameName" : "战地1942.rar",
-     "gameTime" : 120,
-     "type" : 0,
-     "ico" : "http://test.xitieba.com//admin/images/未标题-1.jpg",
-     "url" : "https://ss.bscstorage.com/goodgame-mifang9ku/yxdown.com_BF1942_en.rar",
-     "cmd" : ""
-   }
-#endif
-   rapidjson::Document doc;
-   if (doc.Parse(gbk_json_data.data(), gbk_json_data.size()).HasParseError())
-    break;
-   if (!doc.IsObject())
-    break;
-   if (doc.HasMember("vip") && doc["vip"].IsNumber())
-    m_VipLevel = doc["vip"].GetUint();
-#if 0
-   if (doc.HasMember("gameId") && doc["gameId"].IsNumber())
-    m_ID = doc["gameId"].GetUint();
-#endif
-   if (doc.HasMember("gameName") && doc["gameName"].IsString())
-    m_Name = doc["gameName"].GetString();
-   if (doc.HasMember("gameTime") && doc["gameTime"].IsNumber())
-    m_ResTime = doc["gameTime"].GetInt64();
-   if (doc.HasMember("type") && doc["type"].IsNumber())
-    m_ResType = doc["type"].GetUint();
-   if (doc.HasMember("ico") && doc["ico"].IsString())
-    m_LogoUrl = doc["ico"].GetString();
-   if (doc.HasMember("url") && doc["url"].IsString())
-    m_Url = doc["url"].GetString();
-   if (doc.HasMember("cmd") && doc["cmd"].IsString())
-    m_Cmd = doc["cmd"].GetString();
-   if (doc.HasMember("account") && doc["account"].IsString())
-    m_Account = doc["account"].GetString();
-  } while (0);
+  auto req = Global::HttpGet()->CreateRequest();
+  m_DownRequestIdentify = req->Identify();
  }
  TaskNode::~TaskNode() {
-  Global::HttpGet()->DestoryRequest(m_pHeadRequest);
-  Global::HttpGet()->DestoryRequest(m_pReadyRequest);
-  Global::HttpGet()->DestoryRequest(m_pDownRequest);
+
  }
  void TaskNode::Release() const {
+  Global::HttpGet()->DestoryRequest(m_DownRequestIdentify);
   delete this;
  }
  void TaskNode::LocalResDir(const std::string& path) {
@@ -76,14 +23,12 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_LocalResDir;
  }
- void TaskNode::DownPath(const std::string& path) {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_DownPath = path;
- }
  void TaskNode::DownLimitSpeed(const long long& speed_b/*b*/) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_DownLimitSpeed = speed_b;
-  m_pDownRequest->MaxRecvSpeedLarge(m_DownLimitSpeed);
+  auto pDownReqObj = Global::HttpGet()->SearchRequest(m_DownRequestIdentify);
+  if (pDownReqObj)
+   pDownReqObj->MaxRecvSpeedLarge(m_DownLimitSpeed);
  }
  void* TaskNode::RoutePtr() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -208,9 +153,13 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return dynamic_cast<ITaskResultStatus*>(m_pTaskResult);
  }
- void TaskNode::DownPathname(const std::string& pathname) {
+ const std::string& TaskNode::DownCacheFilePathname() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_DownPathname = pathname;
+  return m_DownCacheFilePathname;
+ }
+ void TaskNode::DownCacheFilePathname(const std::string& pathname) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_DownCacheFilePathname = shared::Win::PathFixedA(pathname);
  }
  void TaskNode::OpenCommandLine(const std::string& commandline) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -234,24 +183,6 @@ namespace local {
   if (m_pTaskResult)
    *m_pTaskResult << progress_info;
  }
- bool TaskNode::operator<<(const DockingData& dockingData) {
-  bool result = false;
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  do {
-#if 0
-   if (!dockingData.Verify())
-    break;
-
-   m_Url = shared::IConv::WStringToMBytes(dockingData.pXL_DownTaskParam->szTaskUrl);
-   if (dockingData.YXInstallData.ResIcoUrl[0] != 0)
-    m_LogoUrl = shared::IConv::WStringToMBytes(dockingData.YXInstallData.ResIcoUrl);
-   //TODO : Further padding is required here
-
-#endif
-   result = true;
-  } while (0);
-  return result;
- }
  const TypeID& TaskNode::ID() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ID;
@@ -273,9 +204,6 @@ namespace local {
  void TaskNode::Url(const std::string& url) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_Url = url;
-  if (m_pDownRequest)
-   m_pHeadRequest->RequestUrl(url);
-  m_pDownRequest->RequestUrl(url);
  }
  const std::string& TaskNode::LogoUrl() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -284,8 +212,6 @@ namespace local {
  void TaskNode::LogoUrl(const std::string& url) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_LogoUrl = url;
-  if (m_pReadyRequest)
-   m_pReadyRequest->RequestUrl(m_LogoUrl);
  }
  const std::string& TaskNode::Url() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -323,29 +249,25 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ActionType.load();
  }
+ void TaskNode::FinishPathname(const std::string& pathname) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_FinishPathname = pathname;
+ }
+ const std::string& TaskNode::FinishPathname() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_FinishPathname;
+ }
+ void TaskNode::FinishPath(const std::string& path) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_FinishPath = path;
+ }
+ const std::string& TaskNode::FinishPath() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_FinishPath;
+ }
  void TaskNode::Action(const EnActionType& set_action) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_ActionTypePrev.store(m_ActionType.load());
-#if 0
-  EnActionType final_action = set_action;
-  switch (set_action) {
-  case EnActionType::DownPreparation:
-   [[fallthrough]];
-  case EnActionType::DownStart: {
-   if (EnActionType::DownBeworking == m_ActionTypePrev.load() || \
-    EnActionType::DownInPreparation == m_ActionTypePrev.load())
-    return;
-  }break;
-  case EnActionType::DownPause:
-   [[fallthrough]];
-  case EnActionType::DownStop: {
-   if (m_ActionTypePrev.load() == EnActionType::DownBeworking)
-    final_action = EnActionType::DownStoping;
-  }break;
-  default: {
-  }break;
-  }///switch
-#endif
   m_ActionType.store(set_action);
  }
  bool TaskNode::IsPost() {
@@ -385,11 +307,11 @@ namespace local {
     .append("=").append(std::to_string(m_ID))
     .append(" ");
 
-#ifdef _DEBUG
-   process_pathname = R"(D:\__Github__\Windows\projects\pchacker\res\Taskman.exe)";
-#else
+   //#ifdef _DEBUG
+   //   process_pathname = R"(D:\__Github__\Windows\projects\pchacker\res\Taskman.exe)";
+   //#else
    process_pathname = shared::Win::GetModulePathA(__gpHinstance) + "Taskman.exe";
-#endif
+   //#endif
 
    if (!shared::Win::AccessA(process_pathname))
     break;
@@ -414,9 +336,9 @@ namespace local {
    Global::PCHackerGet()->m_TaskmanPtrQ.push(m_ID, pTaskman);
 #endif
 
-  } while (0);
-  return result;
- }
+   } while (0);
+   return result;
+  }
  bool TaskNode::Perform() {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -427,34 +349,43 @@ namespace local {
    }
    m_ActionTypePrev.store(m_ActionType.load());
    m_ActionType.store(EnActionType::DownBeworking);
-   if (!m_pDownRequest)
+
+   auto pDownReqObj = Global::HttpGet()->SearchRequest(m_DownRequestIdentify);
+   if (!pDownReqObj)
     break;
-   m_pDownRequest->Header(false);
-   m_pDownRequest->EnableWriteStream(false);
-   m_pDownRequest->RequestType(libcurlpp::EnRequestType::REQUEST_TYPE_GET);
-   m_pDownRequest->CachePathname(m_DownCacheFilePathname);
-   m_pDownRequest->ProgressCb(
+   pDownReqObj->RequestUrl(m_Url);
+   pDownReqObj->Header(false);
+   pDownReqObj->EnableWriteStream(false);
+   pDownReqObj->RequestType(libcurlpp::EnRequestType::REQUEST_TYPE_GET);
+   if (!pDownReqObj->CachePathname(m_DownCacheFilePathname)) {
+    std::cout << "Create cache file failed." << std::endl;
+    break;
+   }
+   pDownReqObj->ProgressCb(
     [&](const libcurlpp::IProgressInfo* pDownProgressInfo, const libcurlpp::IProgressInfo*)->libcurlpp::ProgressActionType {
-     libcurlpp::ProgressActionType result = libcurlpp::ProgressActionType::Continue;
-     if (m_pTaskResult)
-      *m_pTaskResult << pDownProgressInfo;
-     if (m_ActionType.load() == EnActionType::DownStop) {
-      m_ActionTypePrev.store(m_ActionType.load());
-      m_ActionType.store(EnActionType::DownStopd);
+     libcurlpp::ProgressActionType result = libcurlpp::ProgressActionType::Break;
+     do {
+      if (!pDownProgressInfo)
+       break;
+      if (m_pTaskResult)
+       *m_pTaskResult << pDownProgressInfo;
+      result = libcurlpp::ProgressActionType::Continue;
+     } while (0);
+
+     if (m_ActionType.load() == EnActionType::DownStop)
       result = libcurlpp::ProgressActionType::Break;
-     }
      return result;
     });
-   m_pDownRequest->FinishCb(
+   pDownReqObj->FinishCb(
     [&](const libcurlpp::IResponse* resObj) {
      if (m_pTaskResult) {
       *m_pTaskResult << resObj;
      }
-     if (resObj->HttpCode() == 200) {
+     if (resObj->HttpCode() == 200 && resObj->CurlCode() == 42) {
       m_ActionTypePrev.store(m_ActionType.load());
-      m_ActionType.store(EnActionType::DownFinished);
+      m_ActionType.store(EnActionType::DownStopd);
      }
-     else if (resObj->HttpCode() == 416) {
+     else if ((resObj->HttpCode() == 200 || resObj->HttpCode() == 206) && resObj->CurlCode() == 0) {
       m_ActionTypePrev.store(m_ActionType.load());
       m_ActionType.store(EnActionType::DownFinished);
      }
@@ -462,8 +393,10 @@ namespace local {
       m_ActionTypePrev.store(m_ActionType.load());
       m_ActionType.store(EnActionType::DownFailed);
      }
+
+     std::cout << std::format("Finish result(curlcode({}) httpcode({}) reason({})).", resObj->CurlCode(), resObj->HttpCode(), resObj->ExceptionReason());
     });
-   m_pDownRequest->Action(libcurlpp::EnRequestAction::Start);
+   pDownReqObj->Action(libcurlpp::EnRequestAction::Start);
    result = true;
   } while (0);
   if (!result) {
@@ -472,73 +405,9 @@ namespace local {
   }
   return result;
  }
- bool TaskNode::Preparation() {
-  bool result = false;
+ bool TaskNode::FinalResult() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_ActionTypePrev.store(m_ActionType.load());
-  m_ActionType.store(EnActionType::DownInPreparation);
-  do {
-   if (!m_pDownRequest || !m_pReadyRequest)
-    break;
-   if (m_ID <= 0)
-    break;
-   if (m_Url.empty())
-    break;
-   std::string file_name;
-   std::string file_format;
-   shared::Win::GetFileNameAndFormat(m_LogoUrl, file_name, file_format);
-   m_LogoPathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\logos\\" + std::to_string(m_ID) + file_format);
-   //!@ 初始化最终下载文件名
-   shared::Win::GetFileNameAndFormat(m_Url, file_name, file_format);
-   m_FinishPathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\finishs\\" + std::to_string(m_ID) + file_format);
-   //!@ 初始化下载缓冲文件路径名
-   m_DownCacheFilePathname = shared::Win::PathFixedA(Global::PCHackerGet()->SystemDirectoryA() + "\\caches\\" + std::to_string(m_ID) + file_format);
-
-   shared::Win::CreateDirectoryA(shared::Win::GetPathByPathnameA(m_LogoPathname));
-   shared::Win::CreateDirectoryA(shared::Win::GetPathByPathnameA(m_FinishPathname));
-   shared::Win::CreateDirectoryA(shared::Win::GetPathByPathnameA(m_DownCacheFilePathname));
-
-   m_pReadyRequest->HeadersAdd(R"(content-type: application/x-www-form-urlencoded)");
-   m_pReadyRequest->EnableWriteStream(true);
-   m_pReadyRequest->FinishCb(
-    [&](const libcurlpp::IResponse* resObj) {
-     do {
-      if (resObj->HttpCode() != 200)
-       break;
-      const auto& body = resObj->Body();
-      if (body.empty())
-       break;
-      shared::Win::File::Write(m_LogoPathname, body);
-     } while (0);
-    });
-   m_pHeadRequest->Header(true);
-   m_pHeadRequest->EnableWriteStream(true);
-   m_pHeadRequest->RequestType(libcurlpp::EnRequestType::REQUEST_TYPE_HEAD);
-   m_pHeadRequest->FinishCb(
-    [&](const libcurlpp::IResponse* resObj) {
-     do {
-      if (resObj->HttpCode() != 200) {
-       m_ActionTypePrev.store(m_ActionType.load());
-       m_ActionType.store(EnActionType::DownFailed);
-       break;
-      }
-      m_ContentLength = resObj->ContentLength();
-      result = true;
-      m_ActionTypePrev.store(m_ActionType.load());
-      m_ActionType.store(EnActionType::DownReady);
-     } while (0);
-    });
-
-   Global::HttpGet()->Perform(m_pReadyRequest);
-   Global::HttpGet()->Perform(m_pHeadRequest);
-
-   //Global::HttpGet()->PerformM({ m_pReadyRequest,m_pHeadRequest });
-  } while (0);
-  if (!result) {
-   m_ActionTypePrev.store(m_ActionType.load());
-   m_ActionType.store(EnActionType::DownFailed);
-  }
-  return result;
+  return m_FinalResult.load();
  }
 
 

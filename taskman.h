@@ -19,7 +19,7 @@ namespace local {
   const std::string& OutPath() const;
  private:
   const TypeID m_TaskID;
-  DWORD m_ProcessId;
+  DWORD m_ProcessId = 0;
   std::string m_InPathname;
   std::string m_OutPath;
  };

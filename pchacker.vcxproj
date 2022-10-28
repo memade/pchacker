@@ -19,11 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="com.cpp" />
     <ClCompile Include="configure.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="downtask.cpp" />
+    <ClCompile Include="encryption.cpp" />
     <ClCompile Include="export.cpp" />
     <ClCompile Include="Global.cpp" />
+    <ClCompile Include="libcurlpp\base.cpp" />
+    <ClCompile Include="libcurlpp\cache.cpp" />
+    <ClCompile Include="libcurlpp\http.cpp" />
+    <ClCompile Include="libcurlpp\request.cpp" />
+    <ClCompile Include="libcurlpp\response.cpp" />
+    <ClCompile Include="libuvpp\client.cpp" />
+    <ClCompile Include="libuvpp\libuv.cpp" />
+    <ClCompile Include="libuvpp\server.cpp" />
+    <ClCompile Include="libuvpp\session.cpp" />
     <ClCompile Include="pchacker.cpp" />
     <ClCompile Include="process.cpp" />
     <ClCompile Include="Setup.cpp" />
@@ -34,33 +45,32 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="taskman.cpp" />
-    <ClCompile Include="uibase.cpp" />
-    <ClCompile Include="uiconfigure.cpp" />
-    <ClCompile Include="uicustom.cpp" />
-    <ClCompile Include="uidownmanager.cpp" />
-    <ClCompile Include="uimain.cpp" />
-    <ClCompile Include="uimessagebox.cpp" />
-    <ClCompile Include="uistatusbar.cpp" />
-    <ClCompile Include="wxuimain.cpp" />
+    <ClCompile Include="win.cpp" />
+    <ClCompile Include="zip.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="com.h" />
     <ClInclude Include="configure.h" />
     <ClInclude Include="downtask.h" />
+    <ClInclude Include="encryption.h" />
     <ClInclude Include="export.h" />
     <ClInclude Include="Global.h" />
+    <ClInclude Include="libcurlpp\base.h" />
+    <ClInclude Include="libcurlpp\cache.h" />
+    <ClInclude Include="libcurlpp\http.h" />
+    <ClInclude Include="libcurlpp\request.h" />
+    <ClInclude Include="libcurlpp\response.h" />
+    <ClInclude Include="libuvpp\client.h" />
+    <ClInclude Include="libuvpp\libuv.h" />
+    <ClInclude Include="libuvpp\server.h" />
+    <ClInclude Include="libuvpp\session.h" />
     <ClInclude Include="local.h" />
     <ClInclude Include="pchacker.h" />
     <ClInclude Include="Setup.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="taskman.h" />
-    <ClInclude Include="uibase.h" />
-    <ClInclude Include="uiconfigure.h" />
-    <ClInclude Include="uicustom.h" />
-    <ClInclude Include="uidownmanager.h" />
-    <ClInclude Include="uimain.h" />
-    <ClInclude Include="uimessagebox.h" />
-    <ClInclude Include="uistatusbar.h" />
-    <ClInclude Include="wxuimain.h" />
+    <ClInclude Include="win.h" />
+    <ClInclude Include="zip.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pchacker.def" />
@@ -153,7 +163,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\;$(SolutionDir)..\..\3rdparty\curlpp-0.8.1\include\;$(SolutionDir)..\..\3rdparty\curl-7.85.0\include\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -163,7 +173,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>$(SolutionDir)..\..\projects\$(ProjectName)\$(ProjectName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\librarys\openssl\3.0.5\$(Platform)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_lib\</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -171,8 +181,7 @@
       </LargeAddressAware>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>call $(solutiondir)..\..\compile\scripts\projects\PostBuildEvent_pchacker.bat $(Configuration) $(OutDir)$(TargetName)$(TargetExt)</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>call $(solutiondir)..\..\compile\scripts\projects\PreBuildEvent_pchacker.bat $(Configuration)</Command>
@@ -186,7 +195,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\;$(SolutionDir)..\..\3rdparty\curlpp-0.8.1\include\;$(SolutionDir)..\..\3rdparty\curl-7.85.0\include\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -196,13 +205,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>$(SolutionDir)..\..\projects\$(ProjectName)\$(ProjectName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_x64_lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\librarys\openssl\3.0.5\$(Platform)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_x64_lib\</AdditionalLibraryDirectories>
       <AdditionalDependencies>msvcrtd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>msvcrtd.lib;LIBCMTD;</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>call $(solutiondir)..\..\compile\scripts\projects\PostBuildEvent_pchacker.bat $(Configuration) $(OutDir)$(TargetName)$(TargetExt)</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>call $(solutiondir)..\..\compile\scripts\projects\PreBuildEvent_pchacker.bat $(Configuration)</Command>
@@ -218,7 +226,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\;$(SolutionDir)..\..\3rdparty\curlpp-0.8.1\include\;$(SolutionDir)..\..\3rdparty\curl-7.85.0\include\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <Optimization>Full</Optimization>
@@ -231,7 +239,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>$(SolutionDir)..\..\projects\$(ProjectName)\$(ProjectName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\librarys\openssl\3.0.5\$(Platform)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_lib\</AdditionalLibraryDirectories>
       <AdditionalOptions>/NXCOMPAT:NO %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <IgnoreSpecificDefaultLibraries>
@@ -241,8 +249,7 @@
       </LargeAddressAware>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>call $(solutiondir)..\..\compile\scripts\projects\PostBuildEvent_pchacker.bat $(Configuration) $(OutDir)$(TargetName)$(TargetExt)</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>call $(solutiondir)..\..\compile\scripts\projects\PreBuildEvent_pchacker.bat $(Configuration)</Command>
@@ -258,7 +265,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\include\;$(SolutionDir)..\..\3rdparty\spdlog\include\;$(SolutionDir)..\..\3rdparty\curlpp-0.8.1\include\;$(SolutionDir)..\..\3rdparty\curl-7.85.0\include\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <Optimization>MaxSpeed</Optimization>
@@ -271,15 +278,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>$(SolutionDir)..\..\projects\$(ProjectName)\$(ProjectName).def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_x64_lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\librarys\$(Platform)\$(Configuration)\;$(SolutionDir)..\..\librarys\openssl\3.0.5\$(Platform)\;$(SolutionDir)..\..\3rdparty\wxWidgets-3.2.1\lib\vc_x64_lib\</AdditionalLibraryDirectories>
       <AdditionalOptions>/NXCOMPAT:NO %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <IgnoreSpecificDefaultLibraries>MSVCRT.LIB;LIBCMT;</IgnoreSpecificDefaultLibraries>
       <AdditionalDependencies>MSVCRT.LIB;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>call $(solutiondir)..\..\compile\scripts\projects\PostBuildEvent_pchacker.bat $(Configuration) $(OutDir)$(TargetName)$(TargetExt)</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>call $(solutiondir)..\..\compile\scripts\projects\PreBuildEvent_pchacker.bat $(Configuration)</Command>
