@@ -23,6 +23,8 @@ namespace local {
   ICom* ComGet() const override final;
   IWin* WinGet() const override final;
   IEncryption* EncryptionGet() const override final;
+  libcurlpp::IHttpApi* LibcurlppGet() const override final;
+  libuvpp::ILibuv* LibuvppGet() const override final;
  protected:
   void RegisterTaskResultStatusCallback(const tfTaskResultStatusCb&) override final;
  public:

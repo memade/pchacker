@@ -3,6 +3,8 @@
 
 namespace local {
  class Global final {
+  using tf_api_object_init = void* (__stdcall*)(const void*, unsigned long);
+  using tf_api_object_uninit = void(__stdcall*)(void);
  public:
   Global();
   ~Global();
@@ -16,15 +18,22 @@ namespace local {
   static void SystemExitFlag(const bool&);
   static bool SystemExitFlag();
   static std::string lib7zPathname();
-  static libuvpp::IClient* ClientGet();
+  static pchacker::libuvpp::IClient* ClientGet();
+  static std::string IPAddr();
  private:
   bool m_Ready = false;
   Core* m_pCore = nullptr;
   pchacker::TypeID m_TaskId = 0;
   std::atomic_bool m_SystemExitFlag = false;
-  libuvpp::ILibuv* m_pUvpp = nullptr;
-  libuvpp::IClient* m_pClient = nullptr;
+  pchacker::libuvpp::IClient* m_pClient = nullptr;
+  pchacker::IPCHacker* m_pPCHacker = nullptr;
   std::string m_lib7zPathname;
+
+  std::string m_IPAddr;
+
+  shared::Win::PE::HMEMORYMODULE m_hPELoad = nullptr;
+  tf_api_object_init m_peload_api_object_init = nullptr;
+  tf_api_object_uninit m_peload_api_object_uninit = nullptr;
  };
 
 

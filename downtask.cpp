@@ -307,15 +307,15 @@ namespace local {
     .append("=").append(std::to_string(m_ID))
     .append(" ");
 
-   //#ifdef _DEBUG
-   //   process_pathname = R"(D:\__Github__\Windows\projects\pchacker\res\Taskman.exe)";
-   //#else
-   process_pathname = shared::Win::GetModulePathA(__gpHinstance) + "Taskman.exe";
-   //#endif
+   commandline
+    .append(componects_taskman::mapCommandLineIdentify.at(componects_taskman::EnCmdType::IPAddr))
+    .append("=").append(Global::PCHackerGet()->ConfigureGet()->LocalServiceTcpAddr())
+    .append(" ");
+
+   process_pathname = shared::Win::PathFixedA(Global::PCHackerGet()->ConfigureGet()->ProjectCurrentPath() + R"(\Taskman.exe)");
 
    if (!shared::Win::AccessA(process_pathname))
     break;
-
 #if 1 // 发行算法
    if (Global::PCHackerGet()->m_TaskmanPtrQ.search(m_ID))
     break;
@@ -325,10 +325,10 @@ namespace local {
     [&](const HANDLE&, const DWORD& create_pid) {
      auto pTaskman = new Taskman(m_ID);
      pTaskman->InPathname(m_DownCacheFilePathname);
-     pTaskman->OutPath(shared::Win::GetPathByPathnameA(m_FinishPathname) + std::to_string(m_ID) + "\\");
+     pTaskman->OutPath(m_FinishPath.empty() ? shared::Win::GetPathByPathnameA(m_FinishPathname) : m_FinishPath);
      Global::PCHackerGet()->m_TaskmanPtrQ.push(m_ID, pTaskman);
      result = true;
-    }, true, false, 0);
+    }, false, false, 0);
 #else //!@ 调试算法
    auto pTaskman = new Taskman(m_ID);
    pTaskman->InPathname(m_DownCacheFilePathname);
@@ -336,9 +336,9 @@ namespace local {
    Global::PCHackerGet()->m_TaskmanPtrQ.push(m_ID, pTaskman);
 #endif
 
-   } while (0);
-   return result;
-  }
+  } while (0);
+  return result;
+ }
  bool TaskNode::Perform() {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -394,7 +394,6 @@ namespace local {
       m_ActionType.store(EnActionType::DownFailed);
      }
 
-     std::cout << std::format("Finish result(curlcode({}) httpcode({}) reason({})).", resObj->CurlCode(), resObj->HttpCode(), resObj->ExceptionReason());
     });
    pDownReqObj->Action(libcurlpp::EnRequestAction::Start);
    result = true;
@@ -861,6 +860,7 @@ namespace local {
  }
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
+
 
 
 }///namespace lcoal

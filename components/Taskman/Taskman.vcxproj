@@ -89,25 +89,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\projects\pchacker\res\</OutDir>
+    <OutDir>$(SolutionDir)..\..\projects\$(solutionname)\res\</OutDir>
     <IntDir>$(SolutionDir)..\..\objs\$(Platform)\$(Configuration)\$(SolutionName)\$(ProjectName)\</IntDir>
-    <TargetName>$(ProjectName)</TargetName>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\projects\pchacker\res\</OutDir>
+    <OutDir>$(SolutionDir)..\..\projects\$(solutionname)\res\</OutDir>
     <IntDir>$(SolutionDir)..\..\objs\$(Platform)\$(Configuration)\$(SolutionName)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\projects\pchacker\res\</OutDir>
+    <OutDir>$(SolutionDir)..\..\projects\$(solutionname)\res\</OutDir>
     <IntDir>$(SolutionDir)..\..\objs\$(Platform)\$(Configuration)\$(SolutionName)\$(ProjectName)\</IntDir>
-    <TargetName>$(ProjectName)</TargetName>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\projects\pchacker\res\</OutDir>
+    <OutDir>$(SolutionDir)..\..\projects\$(solutionname)\res\</OutDir>
     <IntDir>$(SolutionDir)..\..\objs\$(Platform)\$(Configuration)\$(SolutionName)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>

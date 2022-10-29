@@ -19,11 +19,13 @@ namespace componects_taskman {
  enum class EnCmdType {
   Verify = 0,
   TaskId = 1,
+  IPAddr = 2,
  };
 
  static const std::map<EnCmdType, std::string> mapCommandLineIdentify = {
   {EnCmdType::Verify,R"(--verify)"},
   {EnCmdType::TaskId,R"(--taskid)"},
+  {EnCmdType::IPAddr,R"(--ipaddr)"},
  };
 
 }///componects_taskman

@@ -12,14 +12,14 @@ namespace local {
  void Configure::Init() {
   m_DefaultDownloadCacheFileFormat = R"(.defaultdownloadcachefileformat)";
   m_LocalServiceTcpAddr = R"(127.0.0.1:13762)";
-  const std::string project_current_path = shared::Win::GetModulePathA(__gpHinstance);
+  m_ProjectCurrentPath = shared::Win::GetModulePathA(__gpHinstance);
   m_ProjectLoggerRecorderModuleName = shared::Win::GetModuleNameA(true, __gpHinstance);
-  m_ProjectLoggerRecorderPath = shared::Win::PathFixedA(project_current_path + R"(/logs/)");
-  m_DownResourceCachePath = shared::Win::PathFixedA(project_current_path + R"(/caches/)");
-  m_FinishInstalledPath = shared::Win::PathFixedA(project_current_path + R"(/finishs/)");
-  m_DownPreparedResourcePath = shared::Win::PathFixedA(project_current_path + R"(/prepareds/)");
+  m_ProjectLoggerRecorderPath = shared::Win::PathFixedA(m_ProjectCurrentPath + R"(/logs/)");
+  m_DownResourceCachePath = shared::Win::PathFixedA(m_ProjectCurrentPath + R"(/caches/)");
+  m_FinishInstalledPath = shared::Win::PathFixedA(m_ProjectCurrentPath + R"(/finishs/)");
+  m_DownPreparedResourcePath = shared::Win::PathFixedA(m_ProjectCurrentPath + R"(/prepareds/)");
 
-  shared::Win::CreateDirectoryA(project_current_path);
+  shared::Win::CreateDirectoryA(m_ProjectCurrentPath);
   shared::Win::CreateDirectoryA(m_ProjectLoggerRecorderPath);
   shared::Win::CreateDirectoryA(m_DownResourceCachePath);
   shared::Win::CreateDirectoryA(m_FinishInstalledPath);
@@ -102,13 +102,13 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_DefaultDownloadCacheFileFormat;
  }
- void Configure::EnableLibuvpp(const bool& enable) {
+ void Configure::EnableLibuvppServer(const bool& enable) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_EnableLibuvpp = enable;
+  m_EnableLibuvppServer = enable;
  }
- const bool& Configure::EnableLibuvpp() const {
+ const bool& Configure::EnableLibuvppServer() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return m_EnableLibuvpp;
+  return m_EnableLibuvppServer;
  }
  void Configure::EnableLibcurlpp(const bool& enable) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -118,5 +118,12 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_EnableLibcurlpp;
  }
-
+ void Configure::ProjectCurrentPath(const std::string& path) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_ProjectCurrentPath = path;
+ }
+ const std::string& Configure::ProjectCurrentPath() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return m_ProjectCurrentPath;
+ }
 }///namespace lcoal

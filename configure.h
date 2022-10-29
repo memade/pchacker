@@ -12,6 +12,8 @@ namespace local {
   void Init();
   void UnInit();
  public:
+  void ProjectCurrentPath(const std::string&) override final;
+  const std::string& ProjectCurrentPath() const override final;
   bool DownResourceCachePath(const std::string&) override final;
   const std::string& DownResourceCachePath() const override final;
   bool FinishInstalledPath(const std::string&) override final;
@@ -26,15 +28,15 @@ namespace local {
   const std::string& LocalServiceTcpAddr() const override final;
   void DefaultDownloadCacheFileFormat(const std::string&) override final;
   const std::string& DefaultDownloadCacheFileFormat() const override final;
-  void EnableLibuvpp(const bool&) override final;
-  const bool& EnableLibuvpp() const override final;
+  void EnableLibuvppServer(const bool&) override final;
+  const bool& EnableLibuvppServer() const override final;
   void EnableLibcurlpp(const bool&) override final;
   const bool& EnableLibcurlpp() const override final;
  public:
   void operator<<(const Configure*);
  private:
   bool m_EnableLibcurlpp = false;
-  bool m_EnableLibuvpp = false;
+  bool m_EnableLibuvppServer = false;
   std::string m_FinishInstalledPath;
   std::string m_DownResourceCachePath;
   std::string m_DownPreparedResourcePath;
@@ -42,6 +44,7 @@ namespace local {
   std::string m_ProjectLoggerRecorderModuleName;
   std::string m_LocalServiceTcpAddr;
   std::string m_DefaultDownloadCacheFileFormat;
+  std::string m_ProjectCurrentPath;
  };
 
 }///namespace local 

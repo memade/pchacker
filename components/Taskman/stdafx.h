@@ -3,7 +3,6 @@
 
 #include <win.h>
 #include <command.h>
-#include <spdlog.hpp>
 #include <bit7z.h>
 #include <zip++.h>
 #include <encryption.hpp>
@@ -11,8 +10,11 @@
 #include "Declspec.h"
 /// To use the protocol message definition
 #include <pchacker.hpp>
-#include <libuvpp.hpp>
-#include <uvpp.hpp>
+#if _DEBUG
+#include <res/peloadd.res.h>
+#else
+#include <res/peload.res.h>
+#endif
 
 using namespace componects_taskman;
 #include "Core.h"

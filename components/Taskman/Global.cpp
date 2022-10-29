@@ -24,6 +24,14 @@ namespace local {
    auto found_task_id = CmdNodes.find(mapCommandLineIdentify.at(EnCmdType::TaskId));
    if (found_task_id == CmdNodes.end())
     break;
+
+   auto found_ipaddr = CmdNodes.find(mapCommandLineIdentify.at(EnCmdType::IPAddr));
+   if (found_ipaddr == CmdNodes.end())
+    break;
+   m_IPAddr = found_ipaddr->second;
+   if (m_IPAddr.empty())
+    break;
+
    m_TaskId = ::strtoul(found_task_id->second.c_str(), nullptr, 10);
    if (m_TaskId <= 0)
     break;
@@ -46,12 +54,24 @@ namespace local {
    }
    if (!shared::Win::AccessA(m_lib7zPathname))
     break;
-#ifdef _DEBUG
-   m_pUvpp = libuvpp::ILibuv::CreateInterface(R"(D:\__Github__\Windows\bin\Win32\Debug\libuvpp.dll)");
+
+#if _DEBUG
+   std::string peload_pe_buffer((char*)&peloadd_res[0], sizeof(peloadd_res));
 #else
-   m_pUvpp = libuvpp::ILibuv::CreateInterface((shared::Win::GetModulePathA() + R"(libuvpp.dll)").c_str());
+   std::string peload_pe_buffer((char*)&peload_res[0], sizeof(peload_res));
 #endif
-   m_pClient = m_pUvpp->CreateClient();
+   m_hPELoad = shared::Win::PE::MemoryLoadLibrary(peload_pe_buffer.data(), peload_pe_buffer.size());
+   if (!m_hPELoad)
+    break;
+   m_peload_api_object_init = reinterpret_cast<decltype(m_peload_api_object_init)>(shared::Win::PE::MemoryGetProcAddress(m_hPELoad, "api_object_init"));
+   m_peload_api_object_uninit = reinterpret_cast<decltype(m_peload_api_object_uninit)>(shared::Win::PE::MemoryGetProcAddress(m_hPELoad, "api_object_uninit"));
+   if (!m_peload_api_object_init || !m_peload_api_object_uninit)
+    break;
+   std::string microsoft_pe{shared::Win::GetModulePathA() + "\\msvcr100.dll"};
+   m_pPCHacker = reinterpret_cast<decltype(m_pPCHacker)>(m_peload_api_object_init(microsoft_pe.data(), static_cast<unsigned long>(microsoft_pe.size())));
+   if (!m_pPCHacker)
+    break;
+   m_pClient = m_pPCHacker->LibuvppGet()->CreateClient();
    m_pCore = new Core();
    if (!m_pCore->Open())
     break;
@@ -63,7 +83,12 @@ namespace local {
   if (m_pCore)
    m_pCore->Close();
   SK_DELETE_PTR(m_pCore);
-  libuvpp::ILibuv::DestoryInterface(m_pUvpp);
+  if (m_peload_api_object_uninit)
+   m_peload_api_object_uninit();
+  if (m_hPELoad) {
+   shared::Win::PE::MemoryFreeLibrary(m_hPELoad);
+   m_hPELoad = nullptr;
+  }
  }
  bool Global::Ready() {
   return __gsGlobal.m_Ready;
@@ -83,7 +108,10 @@ namespace local {
  std::string Global::lib7zPathname() {
   return __gsGlobal.m_lib7zPathname;
  }
- libuvpp::IClient* Global::ClientGet() {
+ pchacker::libuvpp::IClient* Global::ClientGet() {
   return __gsGlobal.m_pClient;
+ }
+ std::string Global::IPAddr() {
+  return __gsGlobal.m_IPAddr;
  }
 }///namespace local

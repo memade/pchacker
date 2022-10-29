@@ -9,6 +9,7 @@ namespace local {
  Win::~Win() {
 
  }
+
  bool Win::IsX64(const std::string& pebuffer) const {
   return shared::Win::PE::IsX64(pebuffer);
  }

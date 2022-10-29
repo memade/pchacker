@@ -44,7 +44,7 @@ namespace local {
    } while (0);
 
    do {
-    if (!m_pConfigure->EnableLibuvpp())
+    if (!m_pConfigure->EnableLibuvppServer())
      break;
 
     Global::ServerGet()->SessionCreateAfterCb(
@@ -118,8 +118,9 @@ namespace local {
 
 
 
-    Global::ServerGet()->Start(libuvpp::EnSocketType::TCP, libuvpp::EnIPV::IPV4, m_pConfigure->LocalServiceTcpAddr());
-
+    if (!Global::ServerGet()->Start(libuvpp::EnSocketType::TCP, libuvpp::EnIPV::IPV4, m_pConfigure->LocalServiceTcpAddr()))
+     break;
+    //::MessageBoxA(NULL, "EnableLibuvpp start success.", NULL, MB_TOPMOST);
    } while (0);
 
 
@@ -137,7 +138,7 @@ namespace local {
    if (m_pConfigure->EnableLibcurlpp())
     Global::HttpGet()->Stop();
 
-   if (m_pConfigure->EnableLibuvpp())
+   if (m_pConfigure->EnableLibuvppServer())
     Global::ServerGet()->Stop();
 
    m_IsOpen.store(false);
@@ -195,5 +196,12 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return dynamic_cast<IZip*>(m_pZip);
  }
-
+ libcurlpp::IHttpApi* PCHacker::LibcurlppGet() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return Global::HttpGet();
+ }
+ libuvpp::ILibuv* PCHacker::LibuvppGet() const {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  return Global::LibuvGet();
+ }
 }///namespace lcoal

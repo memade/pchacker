@@ -17,7 +17,7 @@ namespace pchacker {
    void RequestType(const EnRequestType&) override final;
    void RequestUrl(const std::string&) override final;
    void HeadersSet(const TypeHeaders&) override final;
-   bool HeadersAdd(const std::string&) override final;
+   void HeadersAdd(const std::string&) override final;
    void RoutePtr(void*) override final;
    void* RoutePtr() const override final;
    void FinishCb(const tfFinishCb&) override final;
