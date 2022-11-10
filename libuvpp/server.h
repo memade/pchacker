@@ -11,7 +11,7 @@ namespace pchacker {
   private:
    void Init();
    void UnInit();
-  protected:
+  public:
    const std::string& Addr() const override final;
    const EnIPV& Ipv() const override final;
    const EnSocketType& SocketType() const override final;
@@ -24,7 +24,6 @@ namespace pchacker {
    void SessionDestoryBeforeCb(const tfOnSessionDestoryBeforeCb&) override final;
   public:
    void Stop() override final;
-   void Release() const override final;
   private:
    shared::container::buffer m_BufferWrite;
    tfOnServerMessage m_MessageCb = nullptr;

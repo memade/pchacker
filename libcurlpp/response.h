@@ -78,6 +78,8 @@ namespace pchacker {
    std::atomic_llong m_TargetTotalSize = 0;
    std::atomic_llong m_LastDownSize = 0;
    std::atomic_llong m_LastDownTimestampMS = 0;
+   std::atomic<double> m_LastDownSpeed = 0;
+   std::atomic_llong m_LastDownRemainTime = 0;
    std::atomic_llong m_LastUploadSize = 0;
    std::atomic_llong m_LastUploadTimestampMS = 0;
    std::atomic_llong m_ResumeFromLarge = 0;

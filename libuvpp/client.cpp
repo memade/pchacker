@@ -18,9 +18,6 @@ namespace pchacker {
    SK_DELETE_PTR(m_pBufferRead);
    SK_DELETE_PTR(m_pBufferWrite);
   }
-  void Client::Release() const {
-   delete this;
-  }
   void Client::Reconnection(const time_t& interval) {
    std::lock_guard<std::mutex> lock{ *m_Mutex };
    m_ReconnectionInterval.store(__max(0, interval));

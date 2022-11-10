@@ -30,7 +30,6 @@ namespace pchacker {
    void Write(const std::string&) override final;
   public:
    void Stop() override final;
-   void Release() const override final;
   private:
    std::thread* m_pTUvloopWord = nullptr;
    std::atomic<EnClientStatus> m_Status = EnClientStatus::Unknow;

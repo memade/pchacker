@@ -18,8 +18,8 @@ namespace local {
    if (m_Ready.load())
     break;
    m_pLibuv = new libuvpp::Libuv();
-   m_pServer = m_pLibuv->CreateServer();
-   m_pHttpObj = new libcurlpp::Http();
+   m_pServer = dynamic_cast<libuvpp::Server*>(m_pLibuv->CreateServer());
+   m_pLibcurl = new libcurlpp::Libcurlpp();
    m_pPCHacker = new PCHacker();
    m_Ready.store(true);
   } while (0);
@@ -27,8 +27,14 @@ namespace local {
  }
 
  void Global::UnInit() {
-  m_pLibuv->Release();
-  m_pHttpObj->Release();
+  do {
+   if (!m_Ready.load())
+    break;
+   SK_DELETE_PTR(m_pLibuv);
+   m_pLibcurl->Release();
+   m_Ready.store(false);
+  } while (0);
+
   SK_DELETE_PTR(m_pPCHacker);
 }
 
@@ -42,17 +48,17 @@ namespace local {
   } while (0);
   return result;
  }
- libcurlpp::IHttpApi* Global::HttpGet() {
-  libcurlpp::IHttpApi* result = nullptr;
+ libcurlpp::Libcurlpp* Global::LibcurlGet() {
+  libcurlpp::Libcurlpp* result = nullptr;
   do {
    if (!__gpGlobal)
     break;
-   result = __gpGlobal->m_pHttpObj;
+   result = __gpGlobal->m_pLibcurl;
   } while (0);
   return result;
  }
- libuvpp::IServer* Global::ServerGet() {
-  libuvpp::IServer* result = nullptr;
+ libuvpp::Server* Global::ServerGet() {
+  libuvpp::Server* result = nullptr;
   do {
    if (!__gpGlobal)
     break;
@@ -60,8 +66,8 @@ namespace local {
   } while (0);
   return result;
  }
- libuvpp::ILibuv* Global::LibuvGet() {
-  libuvpp::ILibuv* result = nullptr;
+ libuvpp::Libuv* Global::LibuvGet() {
+  libuvpp::Libuv* result = nullptr;
   do {
    if (!__gpGlobal)
     break;

@@ -8,12 +8,15 @@ namespace pchacker {
   public:
    Libuv();
    virtual ~Libuv();
-  protected:
+  private:
+   void Init();
+   void UnInit();
+  public:
    IServer* CreateServer() override final;
    IClient* CreateClient() override final;
-  public:
-   void Release() const override final;
+   void DestoryServer(IServer*&) override final;
   private:
+   std::atomic_bool m_Ready = false;
    Server* m_pServer = nullptr;
    shared::container::map<TypeIdentify, Client*> m_ClientQ;
   public:

@@ -23,10 +23,11 @@ namespace local {
   ICom* ComGet() const override final;
   IWin* WinGet() const override final;
   IEncryption* EncryptionGet() const override final;
-  libcurlpp::IHttpApi* LibcurlppGet() const override final;
+  libcurlpp::ILibcurlpp* LibcurlppGet() const override final;
   libuvpp::ILibuv* LibuvppGet() const override final;
  protected:
   void RegisterTaskResultStatusCallback(const tfTaskResultStatusCb&) override final;
+  void RegisterOpenResourceCallback(const tfOpenResourceCallback&) override final;
  public:
   shared::container::map<TypeID, Taskman*> m_TaskmanPtrQ;
   shared::container::map<TypeID/*res(game) id*/, TaskNode*> m_TaskPool;
@@ -43,6 +44,7 @@ namespace local {
   std::vector<std::thread> m_Threads;
   std::atomic_bool m_IsOpen = false;
   tfTaskResultStatusCb m_TaskResultStatusCb = nullptr;
+  tfOpenResourceCallback m_OpenResourceCb = nullptr;
  };
 
 }///namespace local 

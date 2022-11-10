@@ -13,15 +13,15 @@ namespace local {
 		void UnInit();
 	public:
 		static PCHacker* PCHackerGet();
-		static libcurlpp::IHttpApi* HttpGet();
-		static libuvpp::ILibuv* LibuvGet();
-		static libuvpp::IServer* ServerGet();
+		static libcurlpp::Libcurlpp* LibcurlGet();
+		static libuvpp::Libuv* LibuvGet();
+		static libuvpp::Server* ServerGet();
 	private:
 		PCHacker* m_pPCHacker = nullptr;
-		libcurlpp::IHttpApi* m_pHttpObj = nullptr;
+		libcurlpp::Libcurlpp* m_pLibcurl = nullptr;
 		std::atomic_bool m_Ready = false;
-		libuvpp::ILibuv* m_pLibuv = nullptr;
-		libuvpp::IServer* m_pServer = nullptr;
+		libuvpp::Libuv* m_pLibuv = nullptr;
+		libuvpp::Server* m_pServer = nullptr;
 	};
 
 

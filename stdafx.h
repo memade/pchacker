@@ -63,7 +63,7 @@ using namespace pchacker;
 #include <libcurlpp/base.h>
 #include <libcurlpp/response.h>
 #include <libcurlpp/request.h>
-#include <libcurlpp/http.h>
+#include <libcurlpp/libcurlpp.h>
 
 
 //!@ local
@@ -82,7 +82,7 @@ using namespace pchacker;
 
 
 #include<res\setup.xml.res.h>
-#include <res\skin.zip.res.h>
+//#include <res\skin.zip.res.h>
 #include <components/Taskman/Declspec.h>
 /// /*新生®（上海）**/
 /// /*2022_09_07T01:06:39.5877592Z**/

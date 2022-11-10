@@ -10,6 +10,7 @@ namespace pchacker {
   Server::~Server() {
    UnInit();
   }
+
   void Server::Init() {
    m_loop_ = new uv::EventLoop();
    m_pUVServer = new uv::TcpServer(m_loop_);
@@ -50,9 +51,6 @@ namespace pchacker {
   void Server::UnInit() {
    SK_DELETE_PTR(m_pUVServer);
    SK_DELETE_PTR(m_loop_);
-  }
-  void Server::Release() const {
-   delete this;
   }
   const std::string& Server::Addr() const {
    std::lock_guard<std::mutex> lock{ *m_Mutex };

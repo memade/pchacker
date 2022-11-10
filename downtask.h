@@ -128,7 +128,6 @@ namespace local {
   void TaskType(const EnTaskType&);
   bool IsPost();
  protected:
-  pchacker::TypeIdentify m_DownRequestIdentify = 0;
   TaskResult* m_pTaskResult = nullptr;
  private:
   std::set<EnActionType> m_ActionPostedQ;

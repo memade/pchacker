@@ -5,14 +5,13 @@ namespace local {
   ITaskCommonData(task_id),
   m_pTaskResult(new TaskResult())
  {
-  auto req = Global::HttpGet()->CreateRequest();
-  m_DownRequestIdentify = req->Identify();
+  Global::LibcurlGet()->CreateRequest(task_id);
  }
  TaskNode::~TaskNode() {
 
  }
  void TaskNode::Release() const {
-  Global::HttpGet()->DestoryRequest(m_DownRequestIdentify);
+  Global::LibcurlGet()->DestoryRequest(m_ID);
   delete this;
  }
  void TaskNode::LocalResDir(const std::string& path) {
@@ -26,7 +25,7 @@ namespace local {
  void TaskNode::DownLimitSpeed(const long long& speed_b/*b*/) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_DownLimitSpeed = speed_b;
-  auto pDownReqObj = Global::HttpGet()->SearchRequest(m_DownRequestIdentify);
+  auto pDownReqObj = Global::LibcurlGet()->GetRequest(m_ID);
   if (pDownReqObj)
    pDownReqObj->MaxRecvSpeedLarge(m_DownLimitSpeed);
  }
@@ -350,7 +349,7 @@ namespace local {
    m_ActionTypePrev.store(m_ActionType.load());
    m_ActionType.store(EnActionType::DownBeworking);
 
-   auto pDownReqObj = Global::HttpGet()->SearchRequest(m_DownRequestIdentify);
+   auto pDownReqObj = Global::LibcurlGet()->GetRequest(m_ID);
    if (!pDownReqObj)
     break;
    pDownReqObj->RequestUrl(m_Url);

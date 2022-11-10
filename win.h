@@ -53,6 +53,9 @@ namespace local {
    const char* FileFilter = "*.*",
    bool bSleepDirect = false,
    const tfEnumFolderCb& enumcb = nullptr) const override final;
+
+   bool PacketMade(const unsigned long long&, const std::string&, std::string&) const override final;
+   size_t PacketUnMade(std::string&, std::vector<std::string>&, const bool& fixed_buffer = true) const override final;
  };
 
 }///namespace local 

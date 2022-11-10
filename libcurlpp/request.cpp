@@ -2,15 +2,10 @@
 namespace pchacker {
  namespace libcurlpp {
 
-  Request::Request(const TypeIdentify& identify) :
-   m_pResponse(new Response(identify)) {
-   __Default();
-  }
+  Request::Request(const TypeIdentify& identify) {
 
-  Request::~Request() {
-   SK_DELETE_PTR(m_pResponse);
-  }
-  void Request::__Default() {
+   m_pResponse = new Response(identify);
+
    setOpt(new curlpp::options::Verbose(true));
    /// 以秒为单位：
    /// curl_setopt($ch, CURLOPT_TIMEOUT, 1);
@@ -43,13 +38,13 @@ namespace pchacker {
    /// 接收缓冲
    setOpt(new curlpp::options::WriteStream(&m_WriteStreamBuffer));
   }
+
+  Request::~Request() {
+   SK_DELETE_PTR(m_pResponse);
+  }
   const TypeIdentify& Request::Identify() const {
    std::lock_guard<std::mutex> lock{ *m_Mutex };
    return m_pResponse->Identify();
-  }
-  void Request::Default() {
-   std::lock_guard<std::mutex> lock{ *m_Mutex };
-   __Default();
   }
   void Request::RoutePtr(void* ptr) {
    std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -110,7 +105,7 @@ namespace pchacker {
         m_pResponse->WhatRequest(R"(Header write callback exception.)");
         break;
        }
-       if (!Http::HeaderParse(std::string(buffer, result), *m_pResponse->ResponseHeaders())) {
+       if (!Libcurlpp::HeaderParse(std::string(buffer, result), *m_pResponse->ResponseHeaders())) {
         m_pResponse->WhatRequest(R"(Header parse exception.)");
         m_pResponse->Action(EnRequestAction::Stop);
         break;
@@ -189,7 +184,7 @@ namespace pchacker {
   }
   void Request::RequestUrl(const std::string& url) {
    std::lock_guard<std::mutex> lock{ *m_Mutex };
-   auto fix_url = Http::UrlFixed(url);
+   auto fix_url = Libcurlpp::UrlFixed(url);
    setOpt(new curlpp::options::Url(fix_url));
    m_pResponse->OriginalRequestUrl(url);
    m_pResponse->FixedRequestUrl(fix_url);

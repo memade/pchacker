@@ -4,23 +4,39 @@ namespace pchacker {
  namespace libuvpp {
 
   Libuv::Libuv() {
-
+   Init();
   }
 
   Libuv::~Libuv() {
-   m_ClientQ.iterate_clear(
-    [](const auto&, Client* pClient, auto&, auto& itclear) {
-     pClient->Stop();
-     pClient->Release();
-     itclear = true;
-    });
-   if (m_pServer) {
-    m_pServer->Stop();
-    m_pServer->Release();
-   }
+   UnInit();
   }
-  void Libuv::Release() const {
-   delete this;
+  void Libuv::Init() {
+   do {
+    if (m_Ready.load())
+     break;
+
+
+
+    m_Ready.store(true);
+   } while (0);
+  }
+  void Libuv::UnInit() {
+   do {
+    if (!m_Ready.load())
+     break;
+
+    m_ClientQ.iterate_clear(
+     [](const auto&, Client* pClient, auto&, auto& itclear) {
+      pClient->Stop();
+      SK_DELETE_PTR(pClient);
+      itclear = true;
+     });
+    if (m_pServer)
+     m_pServer->Stop();
+    SK_DELETE_PTR(m_pServer);
+
+    m_Ready.store(false);
+   } while (0);
   }
   IServer* Libuv::CreateServer() {
    std::lock_guard<std::mutex> lock{ *m_Mutex };
@@ -28,7 +44,13 @@ namespace pchacker {
     m_pServer = new Server();
    return dynamic_cast<IServer*>(m_pServer);
   }
-
+  void Libuv::DestoryServer(IServer*& pServer) {
+   std::lock_guard<std::mutex> lock{ *m_Mutex };
+   if (m_pServer)
+    m_pServer->Stop();
+   SK_DELETE_PTR(m_pServer);
+   pServer = nullptr;
+  }
   IClient* Libuv::CreateClient() {
    std::lock_guard<std::mutex> lock{ *m_Mutex };
    IClient* pClient = new Client(shared::Win::Time::TimeStamp<std::chrono::microseconds>());

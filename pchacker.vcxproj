@@ -28,7 +28,8 @@
     <ClCompile Include="Global.cpp" />
     <ClCompile Include="libcurlpp\base.cpp" />
     <ClCompile Include="libcurlpp\cache.cpp" />
-    <ClCompile Include="libcurlpp\http.cpp" />
+    <ClCompile Include="libcurlpp\libcurlpp.cpp" />
+    <ClCompile Include="libcurlpp\perform.cpp" />
     <ClCompile Include="libcurlpp\request.cpp" />
     <ClCompile Include="libcurlpp\response.cpp" />
     <ClCompile Include="libuvpp\client.cpp" />
@@ -57,7 +58,7 @@
     <ClInclude Include="Global.h" />
     <ClInclude Include="libcurlpp\base.h" />
     <ClInclude Include="libcurlpp\cache.h" />
-    <ClInclude Include="libcurlpp\http.h" />
+    <ClInclude Include="libcurlpp\libcurlpp.h" />
     <ClInclude Include="libcurlpp\request.h" />
     <ClInclude Include="libcurlpp\response.h" />
     <ClInclude Include="libuvpp\client.h" />

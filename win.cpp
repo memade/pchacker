@@ -9,7 +9,12 @@ namespace local {
  Win::~Win() {
 
  }
-
+ bool Win::PacketMade(const unsigned long long& cmd, const std::string& input, std::string& output) const {
+  return shared::Win::Packet::Made(cmd, input, output);
+ }
+ size_t Win::PacketUnMade(std::string& input, std::vector<std::string>& output_s, const bool& fixed_buffer /*= true*/) const {
+  return shared::Win::Packet::UnMade(input, output_s, fixed_buffer);
+ }
  bool Win::IsX64(const std::string& pebuffer) const {
   return shared::Win::PE::IsX64(pebuffer);
  }

@@ -38,7 +38,7 @@ namespace local {
    do {
     if (!m_pConfigure->EnableLibcurlpp())
      break;
-    if (!Global::HttpGet()->Start())
+    if (!Global::LibcurlGet()->Start())
      break;
 
    } while (0);
@@ -108,15 +108,35 @@ namespace local {
           m_ResponseResultQ.push(pTask);
          });
        }break;
+       case pchacker::TYPE_CARDPACKAGE_MSG_HELLO: {
+        auto sk = 0;
+       }break;
+       case pchacker::TYPE_CARDPACKAGE_MSG_EXIT: {
+        
+        if (!m_OpenResourceCb)
+         break;
+        std::vector<std::string> parses;
+        shared::Win::File::ParseA(message, '@', parses);
+        if (parses.size() < 2)
+         break;
+        unsigned long long id = atoll(parses[1].c_str());
+        if (id <= 0)
+         break;
+        m_OpenResourceCb(id);
+       }break;
+       case pchacker::TYPE_CARDPACKAGE_MSG_CHECK_FAILED: {
+        auto sk = 0;
+       }break;
+       case pchacker::TYPE_CARDPACKAGE_MSG_CHECK_SUCCESS: {
+        auto sk = 0;
+       }break;
+
        default:
         break;
        }
       }
 
      });
-
-
-
 
     if (!Global::ServerGet()->Start(libuvpp::EnSocketType::TCP, libuvpp::EnIPV::IPV4, m_pConfigure->LocalServiceTcpAddr()))
      break;
@@ -136,7 +156,7 @@ namespace local {
     break;
 
    if (m_pConfigure->EnableLibcurlpp())
-    Global::HttpGet()->Stop();
+    Global::LibcurlGet()->Stop();
 
    if (m_pConfigure->EnableLibuvppServer())
     Global::ServerGet()->Stop();
@@ -167,6 +187,10 @@ namespace local {
   m_TaskPool.push(task_id, dynamic_cast<TaskNode*>(result));
   return result;
  }
+ void PCHacker::RegisterOpenResourceCallback(const tfOpenResourceCallback& cb) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_OpenResourceCb = cb;
+ }
  void PCHacker::RegisterTaskResultStatusCallback(const tfTaskResultStatusCb& task_status_cb) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_TaskResultStatusCb = task_status_cb;
@@ -196,9 +220,9 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return dynamic_cast<IZip*>(m_pZip);
  }
- libcurlpp::IHttpApi* PCHacker::LibcurlppGet() const {
+ libcurlpp::ILibcurlpp* PCHacker::LibcurlppGet() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  return Global::HttpGet();
+  return Global::LibcurlGet();
  }
  libuvpp::ILibuv* PCHacker::LibuvppGet() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };

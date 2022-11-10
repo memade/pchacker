@@ -35,7 +35,7 @@ namespace pchacker {
   void Response::operator<<(const tagProgress& progress_info) {
    std::lock_guard<std::mutex> lock{ *m_Mutex };
    if (m_pProgressInfoDownload) {
-    Http::UpdateProgressInfo(m_pProgressInfoDownload, progress_info.total_down, progress_info.current_down,
+    Libcurlpp::UpdateProgressInfo(m_pProgressInfoDownload, progress_info.total_down, progress_info.current_down,
      m_LastDownSize.load() * 1.0,
      m_LastDownTimestampMS.load() > 0 ? (progress_info.current_time_stamp - m_LastDownTimestampMS.load()) : (0));
 
@@ -43,8 +43,15 @@ namespace pchacker {
     if (m_pProgressInfoDownload->m_speed_s > 0 || m_LastDownTimestampMS.load() <= 0 || m_LastDownSize.load() <= 0) {
      m_LastDownSize.store(static_cast<long long>(progress_info.current_down));
      m_LastDownTimestampMS.store(progress_info.current_time_stamp);
+
+     m_LastDownSpeed.store(m_pProgressInfoDownload->m_speed_s);
+     m_LastDownRemainTime.store(m_pProgressInfoDownload->m_time_s);
     }
 
+    if (m_pProgressInfoDownload->m_speed_s <= 0 && m_LastDownSpeed.load() >0) {
+     m_pProgressInfoDownload->m_speed_s = m_LastDownSpeed.load();
+     m_pProgressInfoDownload->m_time_s = m_LastDownRemainTime.load();
+    }
    }
    if (m_pProgressInfoUpload) {
 
@@ -174,6 +181,8 @@ namespace pchacker {
    m_TargetTotalSize.store(0);
    m_LastDownSize.store(0);
    m_LastDownTimestampMS.store(0);
+   m_LastDownSpeed.store(0);
+   m_LastDownRemainTime.store(0);
   }
   void Response::CurlCode(const unsigned int& code) {
    std::lock_guard<std::mutex> lock{ *m_Mutex };

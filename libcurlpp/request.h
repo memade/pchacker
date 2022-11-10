@@ -8,10 +8,7 @@ namespace pchacker {
   public:
    Request(const TypeIdentify&);
    virtual ~Request();
-  private:
-   void __Default();
   protected:
-   void Default() override final;
    void Verbose(const bool&) override final;
    void Header(const bool&) override final;
    void RequestType(const EnRequestType&) override final;

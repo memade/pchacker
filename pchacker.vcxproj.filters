@@ -33,13 +33,16 @@
     <ClCompile Include="libcurlpp\cache.cpp">
       <Filter>libcurlpp</Filter>
     </ClCompile>
-    <ClCompile Include="libcurlpp\http.cpp">
+    <ClCompile Include="libcurlpp\libcurlpp.cpp">
       <Filter>libcurlpp</Filter>
     </ClCompile>
     <ClCompile Include="libcurlpp\request.cpp">
       <Filter>libcurlpp</Filter>
     </ClCompile>
     <ClCompile Include="libcurlpp\response.cpp">
+      <Filter>libcurlpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcurlpp\perform.cpp">
       <Filter>libcurlpp</Filter>
     </ClCompile>
   </ItemGroup>
@@ -75,7 +78,7 @@
     <ClInclude Include="libcurlpp\cache.h">
       <Filter>libcurlpp</Filter>
     </ClInclude>
-    <ClInclude Include="libcurlpp\http.h">
+    <ClInclude Include="libcurlpp\libcurlpp.h">
       <Filter>libcurlpp</Filter>
     </ClInclude>
     <ClInclude Include="libcurlpp\request.h">
