@@ -290,6 +290,7 @@ namespace local {
  bool TaskNode::Install() {
   bool result = false;
   std::lock_guard<std::mutex> lock{ *m_Mutex };
+#if 0//!@ 因当前不涉及该业务而禁用
   do {
    //!@ 创建安装进程
    //! 
@@ -336,6 +337,7 @@ namespace local {
 #endif
 
   } while (0);
+#endif
   return result;
  }
  bool TaskNode::Perform() {

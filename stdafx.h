@@ -80,10 +80,11 @@ using namespace pchacker;
 #include "Global.h"
 #include "export.h"
 
-
+#if 0//!@ 因当前不涉及该业务而禁用
 #include<res\setup.xml.res.h>
 //#include <res\skin.zip.res.h>
 #include <components/Taskman/Declspec.h>
+#endif
 /// /*新生®（上海）**/
 /// /*2022_09_07T01:06:39.5877592Z**/
 /// /*_ _ _ _ _ _ _ www.skstu.com _ _ _ _ _ _ _**/
